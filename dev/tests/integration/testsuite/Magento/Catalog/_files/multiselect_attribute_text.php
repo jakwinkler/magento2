@@ -12,11 +12,20 @@ $installer = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create
 $attribute = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
     \Magento\Catalog\Model\ResourceModel\Eav\Attribute::class
 );
+
+$valueOptionArray = [];
+$orderArray = [];
+
+for ($i = 1; $i < 200; $i++) {
+    $valueOptionArray[sprintf('option_%d', $i)] = [sprintf('Multiselect option %d', $i)];
+    $orderArray[sprintf('option_%d', $i)] = $i;
+}
+
 $entityType = $installer->getEntityTypeId('catalog_product');
-if (!$attribute->loadByCode($entityType, 'multiselect_attribute')->getAttributeId()) {
+if (!$attribute->loadByCode($entityType, 'multiselect_entity_text')->getAttributeId()) {
     $attribute->setData(
         [
-            'attribute_code' => 'multiselect_attribute',
+            'attribute_code' => 'multiselect_entity_text',
             'entity_type_id' => $entityType,
             'is_global' => 1,
             'is_user_defined' => 1,
@@ -33,22 +42,12 @@ if (!$attribute->loadByCode($entityType, 'multiselect_attribute')->getAttributeI
             'is_visible_on_front' => 0,
             'used_in_product_listing' => 0,
             'used_for_sort_by' => 0,
-            'frontend_label' => ['Multiselect Attribute'],
-            'backend_type' => 'varchar',
+            'frontend_label' => ['Multiselect Entity Text Table'],
+            'backend_type' => 'text',
             'backend_model' => \Magento\Eav\Model\Entity\Attribute\Backend\ArrayBackend::class,
             'option' => [
-                'value' => [
-                    'option_1' => ['Option 1'],
-                    'option_2' => ['Option 2'],
-                    'option_3' => ['Option 3'],
-                    'option_4' => ['Option 4 "!@#$%^&*']
-                ],
-                'order' => [
-                    'option_1' => 1,
-                    'option_2' => 2,
-                    'option_3' => 3,
-                    'option_4' => 4,
-                ],
+                'value' => $valueOptionArray,
+                'order' => $orderArray
             ],
         ]
     );
