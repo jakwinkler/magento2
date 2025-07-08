@@ -6,7 +6,7 @@
 
 namespace Magento\Framework\Code\Minifier\Adapter\Js;
 
-use JShrink\Minifier;
+use Garfix\JsMinify\Minifier;
 use Magento\Framework\Code\Minifier\AdapterInterface;
 
 /**
@@ -15,14 +15,14 @@ use Magento\Framework\Code\Minifier\AdapterInterface;
 class JShrink implements AdapterInterface
 {
     /**
-     * Takes a string containing javascript and removes unneeded characters in
-     * order to shrink the code without altering it's functionality.
+     * Takes a string containing JavaScript and removes unneeded characters
+     * to shrink the code without altering its functionality.
      *
-     * @param string $content The raw javascript to be minified
+     * @param string $content The raw JavaScript to be minified
      * @throws \Exception
-     * @return bool|string
+     * @return string
      */
-    public function minify($content)
+    public function minify($content): string
     {
         return Minifier::minify($content);
     }
