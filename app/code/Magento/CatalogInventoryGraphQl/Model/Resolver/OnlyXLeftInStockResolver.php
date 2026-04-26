@@ -24,11 +24,6 @@ use Magento\Store\Model\ScopeInterface;
 class OnlyXLeftInStockResolver implements ResolverInterface
 {
     /**
-     * Configurable product type code
-     */
-    private const PRODUCT_TYPE_CONFIGURABLE = "configurable";
-
-    /**
      * @param ScopeConfigInterface $scopeConfig
      * @param StockRegistryInterface $stockRegistry
      * @param ProductRepositoryInterface $productRepositoryInterface
@@ -50,9 +45,11 @@ class OnlyXLeftInStockResolver implements ResolverInterface
         }
 
         $product = $value['model'];
-        if ($product->getTypeId() === self::PRODUCT_TYPE_CONFIGURABLE) {
-            $variant = $this->productRepositoryInterface->get($product->getSku());
-            return $this->getOnlyXLeftQty($variant);
+        if ($product->isComposite()) {
+            $resolved = $this->productRepositoryInterface->get($product->getSku());
+            if ((int) $resolved->getId() !== (int) $product->getId()) {
+                return $this->getOnlyXLeftQty($resolved);
+            }
         }
         return $this->getOnlyXLeftQty($product);
     }

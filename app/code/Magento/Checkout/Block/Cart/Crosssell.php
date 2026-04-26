@@ -83,7 +83,7 @@ class Crosssell extends AbstractProduct
      * @param Visibility $productVisibility
      * @param LinkFactory $productLinkFactory
      * @param RelatedProducts $itemRelationsList
-     * @param StockHelper $stockHelper
+     * @param StockHelper|null $stockHelper
      * @param array $data
      * @param CollectionFactory|null $productCollectionFactory
      * @param ProductRepositoryInterface|null $productRepository
@@ -96,7 +96,7 @@ class Crosssell extends AbstractProduct
         Visibility $productVisibility,
         LinkFactory $productLinkFactory,
         RelatedProducts $itemRelationsList,
-        StockHelper $stockHelper,
+        ?StockHelper $stockHelper = null,
         array $data = [],
         ?CollectionFactory $productCollectionFactory = null,
         ?ProductRepositoryInterface $productRepository = null

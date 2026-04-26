@@ -32,14 +32,15 @@ class CartQuantityValidator implements CartQuantityValidatorInterface
     /**
      * CartQuantityValidator Constructor
      *
+    /**
      * @param CartItemRepositoryInterface $cartItemRepository
-     * @param StockRegistryInterface $stockRegistry
+     * @param StockRegistryInterface|null $stockRegistry
      * @param Config $config
      * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly CartItemRepositoryInterface $cartItemRepository,
-        private readonly StockRegistryInterface $stockRegistry,
+        private readonly ?StockRegistryInterface $stockRegistry,
         private readonly Config $config,
         private readonly LoggerInterface $logger
     ) {
@@ -124,6 +125,10 @@ class CartQuantityValidator implements CartQuantityValidatorInterface
         float $customerItemQty,
         int $websiteId
     ): bool {
+        if ($this->stockRegistry === null) {
+            return true;
+        }
+
         $salableQty = $this->stockRegistry->getStockStatus($product->getId(), $websiteId)->getQty();
 
         $this->cumulativeQty[$sku] ??= 0;
@@ -231,6 +236,10 @@ class CartQuantityValidator implements CartQuantityValidatorInterface
      */
     private function isBackordersEnabled(Product $product): bool
     {
+        if ($this->stockRegistry === null) {
+            return false;
+        }
+
         $backorders = $this->stockRegistry->getStockItem(
             $product->getId(),
             $product->getStore()->getWebsiteId()

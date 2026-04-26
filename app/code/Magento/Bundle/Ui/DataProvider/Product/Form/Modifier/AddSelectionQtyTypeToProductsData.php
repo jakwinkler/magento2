@@ -26,9 +26,9 @@ class AddSelectionQtyTypeToProductsData implements ModifierInterface
     /**
      * Initializes dependencies
      *
-     * @param StockRegistryPreloader $stockRegistryPreloader
+     * @param StockRegistryPreloader|null $stockRegistryPreloader
      */
-    public function __construct(StockRegistryPreloader $stockRegistryPreloader)
+    public function __construct(?StockRegistryPreloader $stockRegistryPreloader = null)
     {
         $this->stockRegistryPreloader = $stockRegistryPreloader;
     }
@@ -56,7 +56,7 @@ class AddSelectionQtyTypeToProductsData implements ModifierInterface
         $productIds = array_column($data['items'], 'entity_id');
 
         $stockItems = [];
-        if ($productIds) {
+        if ($productIds && $this->stockRegistryPreloader !== null) {
             $stockItems = $this->stockRegistryPreloader->preloadStockItems($productIds);
         }
 

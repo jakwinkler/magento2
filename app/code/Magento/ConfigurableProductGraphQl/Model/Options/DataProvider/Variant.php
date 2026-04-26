@@ -29,11 +29,11 @@ class Variant
 
     /**
      * @param Configurable $configurableType
-     * @param StatusFactory $stockStatusFactory
+     * @param StatusFactory|null $stockStatusFactory
      */
     public function __construct(
         Configurable $configurableType,
-        StatusFactory $stockStatusFactory
+        ?StatusFactory $stockStatusFactory = null
     ) {
         $this->configurableType = $configurableType;
         $this->stockStatusFactory = $stockStatusFactory;
@@ -54,7 +54,7 @@ class Variant
             ->addFilterByRequiredOptions();
 
         $stockFlag = 'has_stock_status_filter';
-        if (!$collection->hasFlag($stockFlag)) {
+        if ($this->stockStatusFactory !== null && !$collection->hasFlag($stockFlag)) {
             $stockStatusResource = $this->stockStatusFactory->create();
             $stockStatusResource->addStockDataToCollection($collection, true);
             $collection->setFlag($stockFlag, true);

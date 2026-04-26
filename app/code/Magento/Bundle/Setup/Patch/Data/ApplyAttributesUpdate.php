@@ -6,12 +6,13 @@
 
 namespace Magento\Bundle\Setup\Patch\Data;
 
+use Magento\Bundle\Model\Product\Type as BundleType;
+use Magento\Eav\Setup\EavSetup;
+use Magento\Eav\Setup\EavSetupFactory;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Framework\Setup\Patch\PatchVersionInterface;
-use Magento\Eav\Setup\EavSetup;
-use Magento\Eav\Setup\EavSetupFactory;
 
 /**
  * Class \Magento\Bundle\Setup\Patch\ApplyAttributesUpdate
@@ -59,14 +60,18 @@ class ApplyAttributesUpdate implements DataPatchInterface, PatchVersionInterface
             'cost',
             'tier_price',
             'weight',
+            'country_of_manufacture',
+            'msrp',
+            'msrp_display_actual_price_type',
         ];
         foreach ($fieldList as $field) {
-            $applyTo = explode(
-                ',',
-                $eavSetup->getAttribute(\Magento\Catalog\Model\Product::ENTITY, $field, 'apply_to')
-            );
-            if (!in_array(\Magento\Catalog\Model\Product\Type::TYPE_BUNDLE, $applyTo)) {
-                $applyTo[] = \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE;
+            $applyToValue = $eavSetup->getAttribute(\Magento\Catalog\Model\Product::ENTITY, $field, 'apply_to');
+            if ($applyToValue === false) {
+                continue;
+            }
+            $applyTo = explode(',', $applyToValue);
+            if (!in_array(BundleType::TYPE_CODE, $applyTo)) {
+                $applyTo[] = BundleType::TYPE_CODE;
                 $eavSetup->updateAttribute(
                     \Magento\Catalog\Model\Product::ENTITY,
                     $field,
@@ -77,7 +82,7 @@ class ApplyAttributesUpdate implements DataPatchInterface, PatchVersionInterface
         }
 
         $applyTo = explode(',', $eavSetup->getAttribute(\Magento\Catalog\Model\Product::ENTITY, 'cost', 'apply_to'));
-        unset($applyTo[array_search(\Magento\Catalog\Model\Product\Type::TYPE_BUNDLE, $applyTo)]);
+        unset($applyTo[array_search(BundleType::TYPE_CODE, $applyTo)]);
         $eavSetup->updateAttribute(\Magento\Catalog\Model\Product::ENTITY, 'cost', 'apply_to', implode(',', $applyTo));
 
         /**
@@ -105,7 +110,7 @@ class ApplyAttributesUpdate implements DataPatchInterface, PatchVersionInterface
                 'visible_on_front' => false,
                 'used_in_product_listing' => true,
                 'unique' => false,
-                'apply_to' => \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE
+                'apply_to' => BundleType::TYPE_CODE
             ]
         );
 
@@ -130,7 +135,7 @@ class ApplyAttributesUpdate implements DataPatchInterface, PatchVersionInterface
                 'comparable' => false,
                 'visible_on_front' => false,
                 'unique' => false,
-                'apply_to' => \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE
+                'apply_to' => BundleType::TYPE_CODE
             ]
         );
 
@@ -156,7 +161,7 @@ class ApplyAttributesUpdate implements DataPatchInterface, PatchVersionInterface
                 'visible_on_front' => false,
                 'used_in_product_listing' => true,
                 'unique' => false,
-                'apply_to' => \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE
+                'apply_to' => BundleType::TYPE_CODE
             ]
         );
 
@@ -183,7 +188,7 @@ class ApplyAttributesUpdate implements DataPatchInterface, PatchVersionInterface
                 'visible_on_front' => false,
                 'used_in_product_listing' => true,
                 'unique' => false,
-                'apply_to' => \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE
+                'apply_to' => BundleType::TYPE_CODE
             ]
         );
 
@@ -209,7 +214,7 @@ class ApplyAttributesUpdate implements DataPatchInterface, PatchVersionInterface
                 'visible_on_front' => false,
                 'used_in_product_listing' => true,
                 'unique' => false,
-                'apply_to' => \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE
+                'apply_to' => BundleType::TYPE_CODE
             ]
         );
     }

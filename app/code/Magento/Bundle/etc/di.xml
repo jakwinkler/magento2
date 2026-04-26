@@ -28,6 +28,47 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Catalog\Model\Product\CartConfiguration">
+        <plugin name="bundle_product" type="Magento\Bundle\Model\Product\CartConfiguration\Plugin\Bundle" sortOrder="50" />
+    </type>
+    <type name="Magento\Sales\Model\ResourceModel\Report\Bestsellers">
+        <arguments>
+            <argument name="ignoredProductTypes" xsi:type="array">
+                <item name="bundle" xsi:type="string">bundle</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Catalog\Model\Product\Option\SaveHandler">
+        <arguments>
+            <argument name="compositeProductTypes" xsi:type="array">
+                <item name="bundle" xsi:type="string">bundle</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Catalog\Model\Product\Price\Validation\InvalidSkuProcessor">
+        <arguments>
+            <argument name="priceTypeRestrictedTypes" xsi:type="array">
+                <item name="bundle" xsi:type="string">bundle</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Catalog\Model\Product\Price\Validation\TierPriceValidator">
+        <arguments>
+            <argument name="discountOnlyPriceTypes" xsi:type="array">
+                <item name="bundle" xsi:type="string">bundle</item>
+            </argument>
+            <argument name="allowedProductTypes" xsi:type="array">
+                <item name="bundle" xsi:type="string">bundle</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Catalog\Model\Product\Price\BasePriceStorage">
+        <arguments>
+            <argument name="allowedProductTypes" xsi:type="array">
+                <item name="bundle" xsi:type="string">bundle</item>
+            </argument>
+        </arguments>
+    </type>
     <type name="Magento\Catalog\Model\Product\CatalogPrice">
         <arguments>
             <argument name="priceModelPool" xsi:type="array">

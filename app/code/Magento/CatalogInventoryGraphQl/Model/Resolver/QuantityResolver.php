@@ -25,11 +25,6 @@ use Magento\QuoteGraphQl\Model\CartItem\ProductStock;
 class QuantityResolver implements ResolverInterface
 {
     /**
-     * Configurable product type code
-     */
-    private const PRODUCT_TYPE_CONFIGURABLE = "configurable";
-
-    /**
      * Scope config path for not_available_message
      */
     private const CONFIG_PATH_NOT_AVAILABLE_MESSAGE = "cataloginventory/options/not_available_message";
@@ -78,8 +73,11 @@ class QuantityResolver implements ResolverInterface
         /** @var Product $product */
         $product = $value['model'];
 
-        if ($product->getTypeId() === self::PRODUCT_TYPE_CONFIGURABLE) {
-            $product = $this->productRepositoryInterface->get($product->getSku());
+        if ($product->isComposite()) {
+            $resolved = $this->productRepositoryInterface->get($product->getSku());
+            if ((int) $resolved->getId() !== (int) $product->getId()) {
+                $product = $resolved;
+            }
         }
 
         return $this->productStock->getSaleableQty($product, null);

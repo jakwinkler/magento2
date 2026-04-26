@@ -55,7 +55,7 @@ class GetPriceConfigurationObserver implements ObserverInterface, ResetAfterRequ
         if ($this->taxData->displayPriceIncludingTax()) {
             /** @var \Magento\Catalog\Model\Product $product */
             $product = $this->registry->registry('current_product');
-            if ($product->getTypeId() == \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE) {
+            if (method_exists($product->getTypeInstance(), 'getSelectionsCollection')) {
                 $priceConfigObj = $observer->getData('configObj');
                 try {
                     $priceConfig = $this->recurConfigAndUpdatePrice(
@@ -113,10 +113,10 @@ class GetPriceConfigurationObserver implements ObserverInterface, ResetAfterRequ
             && array_key_exists('basePrice', $holder[$key])) {
             /** @var \Magento\Catalog\Model\Product $product */
             $product = $this->registry->registry('current_product');
-            if ($product->getTypeId() == \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE) {
+            $typeInstance = $product->getTypeInstance();
+            if (method_exists($typeInstance, 'getSelectionsCollection')) {
                 $productId = $product->getId() ?? '';
                 if (!isset($this->selectionCache[$productId])) {
-                    $typeInstance = $product->getTypeInstance();
                     $typeInstance->setStoreFilter($product->getStoreId(), $product);
 
                     $selectionCollection = $typeInstance->getSelectionsCollection(

@@ -25,8 +25,6 @@ class PriceRangeDataProvider
 {
     private const STORE_FILTER_CACHE_KEY = '_cache_instance_store_filter';
 
-    private const TYPE_DOWNLOADABLE = 'downloadable';
-
     /**
      * @param PriceProviderPool $priceProviderPool
      * @param Discount $discount
@@ -61,8 +59,8 @@ class PriceRangeDataProvider
         $returnArray['maximum_price'] = ($requestedFields['maximum_price'] ?? 0) ? ($this->canShowPrice($product) ?
             $this->getMaximumProductPrice($product, $store) : $this->formatEmptyResult()) : $this->formatEmptyResult();
 
-        if ($product->getTypeId() === self::TYPE_DOWNLOADABLE &&
-            $product->getData('links_purchased_separately')) {
+        if ($product->getData('links_purchased_separately')
+            && method_exists($product->getTypeInstance(), 'getLinks')) {
             $downloadableLinkPrice = (float)$this->getDownloadableLinkPrice($product);
             if ($downloadableLinkPrice > 0) {
                 $returnArray['maximum_price']['regular_price']['value'] += $downloadableLinkPrice;

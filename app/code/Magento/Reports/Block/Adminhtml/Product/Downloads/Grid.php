@@ -70,7 +70,7 @@ class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
             $storeId
         )->addAttributeToFilter(
             'type_id',
-            [\Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE]
+            ['downloadable']
         )->addSummary();
 
         if ($storeId) {

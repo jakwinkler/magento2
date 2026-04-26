@@ -15,12 +15,12 @@ class SelectionPriceModifier implements SelectionPriceModifierInterface
 {
     /**
      * @param ResourceConnection $resource
-     * @param StockConfigurationInterface $stockConfiguration
+     * @param StockConfigurationInterface|null $stockConfiguration
      * @param string $connectionName
      */
     public function __construct(
         private readonly ResourceConnection $resource,
-        private readonly StockConfigurationInterface $stockConfiguration,
+        private readonly ?StockConfigurationInterface $stockConfiguration = null,
         private readonly string $connectionName = 'indexer'
     ) {
     }
@@ -30,7 +30,7 @@ class SelectionPriceModifier implements SelectionPriceModifierInterface
      */
     public function modify(string $indexTable, array $dimensions): void
     {
-        if (!$this->stockConfiguration->isShowOutOfStock()) {
+        if ($this->stockConfiguration === null || !$this->stockConfiguration->isShowOutOfStock()) {
             return;
         }
 

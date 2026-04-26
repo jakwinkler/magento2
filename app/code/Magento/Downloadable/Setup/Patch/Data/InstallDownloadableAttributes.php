@@ -159,13 +159,16 @@ class InstallDownloadableAttributes implements DataPatchInterface, PatchVersionI
             'cost',
             'tier_price',
             'weight',
+            'msrp',
+            'msrp_display_actual_price_type',
         ];
         // make these attributes applicable to downloadable products
         foreach ($fieldList as $field) {
-            $applyTo = explode(
-                ',',
-                $eavSetup->getAttribute(Product::ENTITY, $field, 'apply_to') ?? ''
-            );
+            $applyToValue = $eavSetup->getAttribute(Product::ENTITY, $field, 'apply_to');
+            if ($applyToValue === false) {
+                continue;
+            }
+            $applyTo = explode(',', $applyToValue ?? '');
             if (!in_array('downloadable', $applyTo)) {
                 $applyTo[] = 'downloadable';
                 $eavSetup->updateAttribute(

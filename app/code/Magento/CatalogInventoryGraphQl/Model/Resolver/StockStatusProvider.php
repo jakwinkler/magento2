@@ -24,16 +24,6 @@ use Magento\Quote\Model\Quote\Item;
 class StockStatusProvider implements ResolverInterface
 {
     /**
-     * Bundle product type code
-     */
-    private const PRODUCT_TYPE_BUNDLE = "bundle";
-
-    /**
-     * Configurable product type code
-     */
-    private const PRODUCT_TYPE_CONFIGURABLE = "configurable";
-
-    /**
      * In Stock return code
      */
     private const IN_STOCK = "IN_STOCK";
@@ -72,8 +62,8 @@ class StockStatusProvider implements ResolverInterface
             return ((int)$stockStatus->getStockStatus()) ? self::IN_STOCK : self::OUT_OF_STOCK;
         }
 
-        if ($cartItem->getProductType() === self::PRODUCT_TYPE_BUNDLE) {
-            return $this->getBundleProductStockStatus($cartItem);
+        if ($cartItem->getHasChildren() && !empty($cartItem->getQtyOptions())) {
+            return $this->getCompositeProductStockStatus($cartItem);
         }
 
         $product = $this->getVariantProduct($cartItem) ?? $cartItem->getProduct();
@@ -83,12 +73,12 @@ class StockStatusProvider implements ResolverInterface
     }
 
     /**
-     * Get stock status of added bundle options
+     * Get stock status of composite product by checking its children options
      *
-     * @param Item $cartItem
+     * @param \Magento\Quote\Model\Quote\Item $cartItem
      * @return string
      */
-    private function getBundleProductStockStatus(Item $cartItem): string
+    private function getCompositeProductStockStatus(Item $cartItem): string
     {
         $qtyOptions = $cartItem->getQtyOptions();
         foreach ($qtyOptions as $qtyOption) {
@@ -110,8 +100,9 @@ class StockStatusProvider implements ResolverInterface
      */
     private function getVariantProduct(Item $cartItem): ?ProductInterface
     {
-        if ($cartItem->getProductType() === self::PRODUCT_TYPE_CONFIGURABLE) {
-            if ($cartItem->getChildren()[0] !== null) {
+        $children = $cartItem->getChildren();
+        if (!empty($children) && $cartItem->getProductType() !== $cartItem->getRealProductType()) {
+            if ($children[0] !== null) {
                 return $this->productRepositoryInterface->get($cartItem->getSku());
             }
         }

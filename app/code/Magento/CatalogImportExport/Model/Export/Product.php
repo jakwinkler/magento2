@@ -443,8 +443,7 @@ class Product extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
         $this->rowCustomizer = $rowCustomizer;
         $this->dateAttrCodes = array_merge($this->dateAttrCodes, $dateAttrCodes);
         $this->filter = $filter ?? ObjectManager::getInstance()->get(ProductFilterInterface::class);
-        $this->stockConfiguration = $stockConfiguration ?? ObjectManager::getInstance()
-                ->get(StockConfigurationInterface::class);
+        $this->stockConfiguration = $stockConfiguration;
         parent::__construct($localeDate, $config, $resource, $storeManager);
 
         $this->initTypeModels()
@@ -645,14 +644,16 @@ class Product extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
                 $stockItemRow['stock_status_changed_auto']
             );
 
-            if ($stockItemRow['use_config_max_sale_qty']) {
-                $stockItemRow['max_sale_qty'] = $this->stockConfiguration->getMaxSaleQty();
-            }
-            if ($stockItemRow['use_config_min_sale_qty']) {
-                $stockItemRow['min_sale_qty'] = $this->stockConfiguration->getMinSaleQty();
-            }
-            if ($stockItemRow['use_config_manage_stock']) {
-                $stockItemRow['manage_stock'] = $this->stockConfiguration->getManageStock();
+            if ($this->stockConfiguration !== null) {
+                if ($stockItemRow['use_config_max_sale_qty']) {
+                    $stockItemRow['max_sale_qty'] = $this->stockConfiguration->getMaxSaleQty();
+                }
+                if ($stockItemRow['use_config_min_sale_qty']) {
+                    $stockItemRow['min_sale_qty'] = $this->stockConfiguration->getMinSaleQty();
+                }
+                if ($stockItemRow['use_config_manage_stock']) {
+                    $stockItemRow['manage_stock'] = $this->stockConfiguration->getManageStock();
+                }
             }
 
             $stockItemRows[$productId] = $stockItemRow;

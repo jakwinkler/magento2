@@ -66,6 +66,26 @@ class Downloadable
     }
 
     /**
+     * Set product_has_weight to 0 for downloadable products before initialization.
+     *
+     * @param \Magento\Catalog\Controller\Adminhtml\Product\Initialization\Helper $subject
+     * @param \Magento\Catalog\Model\Product $product
+     * @param array $productData
+     * @return array
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function beforeInitializeFromData(
+        \Magento\Catalog\Controller\Adminhtml\Product\Initialization\Helper $subject,
+        \Magento\Catalog\Model\Product $product,
+        array $productData
+    ): array {
+        if (!empty($productData['is_downloadable'])) {
+            $productData['product_has_weight'] = 0;
+        }
+        return [$product, $productData];
+    }
+
+    /**
      * Prepare product to save
      *
      * @param \Magento\Catalog\Controller\Adminhtml\Product\Initialization\Helper $subject

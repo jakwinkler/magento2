@@ -5,7 +5,6 @@
  */
 namespace Magento\SalesRule\Model\Rule\Condition\Product;
 
-use Magento\Catalog\Model\Product\Type;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Quote\Api\Data\TotalsItemInterface;
 use Magento\Rule\Model\Condition\Context;
@@ -214,7 +213,7 @@ class Subselect extends Combine
     private function getBaseRowTotalForChildrenProduct(mixed $item, mixed $attr, float $total): float
     {
         $hasValidChild = false;
-        $useChildrenTotal = ($item->getProductType() == Type::TYPE_BUNDLE);
+        $useChildrenTotal = $item->isChildrenCalculated();
         $childrenAttrTotal = 0;
         $children = $item->getChildren();
         if (!empty($children)) {

@@ -19,11 +19,6 @@ use Magento\CatalogInventory\Model\Stock\Item;
 class StockItemService
 {
     /**
-     * Configurable product type code
-     */
-    private const PRODUCT_TYPE_CONFIGURABLE = "configurable";
-
-    /**
      * @var ProductRepositoryInterface
      */
     private $productRepositoryInterface;
@@ -57,8 +52,11 @@ class StockItemService
         if (!isset($product)) {
             throw new LocalizedException(__('"model" value should be specified'));
         }
-        if ($product->getTypeId() === self::PRODUCT_TYPE_CONFIGURABLE) {
-            $product = $this->productRepositoryInterface->get($product->getSku());
+        if ($product->isComposite()) {
+            $resolved = $this->productRepositoryInterface->get($product->getSku());
+            if ((int) $resolved->getId() !== (int) $product->getId()) {
+                $product = $resolved;
+            }
         }
         return $this->stockRegistry->getStockItem($product->getId(), $product->getStore()->getWebsiteId());
     }

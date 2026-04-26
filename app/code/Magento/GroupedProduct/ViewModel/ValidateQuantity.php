@@ -18,11 +18,11 @@ class ValidateQuantity implements ArgumentInterface
 {
     /**
      * @param Json $serializer
-     * @param QuantityValidator $productQuantityValidator
+     * @param QuantityValidator|null $productQuantityValidator
      */
     public function __construct(
         private readonly Json $serializer,
-        private readonly QuantityValidator $productQuantityValidator,
+        private readonly ?QuantityValidator $productQuantityValidator = null,
     ) {
     }
 
@@ -36,10 +36,14 @@ class ValidateQuantity implements ArgumentInterface
      */
     public function getQuantityValidators(int $productId, int|null $websiteId): string
     {
+        $validatorData = $this->productQuantityValidator !== null
+            ? $this->productQuantityValidator->getData($productId, $websiteId)
+            : [];
+
         return $this->serializer->serialize(
             array_merge(
                 ['validate-grouped-qty' => '#super-product-table'],
-                $this->productQuantityValidator->getData($productId, $websiteId)
+                $validatorData
             )
         );
     }

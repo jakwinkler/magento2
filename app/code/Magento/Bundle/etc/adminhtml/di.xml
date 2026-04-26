@@ -93,4 +93,18 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\Eav">
+        <arguments>
+            <argument name="percentageSpecialPriceTypes" xsi:type="array">
+                <item name="bundle" xsi:type="string">bundle</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Sales\Block\Adminhtml\Order\Create\Items\Grid">
+        <arguments>
+            <argument name="discountTierPriceTypes" xsi:type="array">
+                <item name="bundle" xsi:type="string">bundle</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

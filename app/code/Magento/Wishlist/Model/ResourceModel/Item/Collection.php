@@ -177,7 +177,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      * @param \Psr\Log\LoggerInterface $logger
      * @param \Magento\Framework\Data\Collection\Db\FetchStrategyInterface $fetchStrategy
      * @param \Magento\Framework\Event\ManagerInterface $eventManager
-     * @param \Magento\CatalogInventory\Api\StockConfigurationInterface $stockConfiguration
+     * @param \Magento\CatalogInventory\Api\StockConfigurationInterface|null $stockConfiguration
      * @param \Magento\Sales\Helper\Admin $adminhtmlSales
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Framework\Stdlib\DateTime\DateTime $date
@@ -202,7 +202,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
         \Psr\Log\LoggerInterface $logger,
         \Magento\Framework\Data\Collection\Db\FetchStrategyInterface $fetchStrategy,
         \Magento\Framework\Event\ManagerInterface $eventManager,
-        \Magento\CatalogInventory\Api\StockConfigurationInterface $stockConfiguration,
+        ?\Magento\CatalogInventory\Api\StockConfigurationInterface $stockConfiguration,
         \Magento\Sales\Helper\Admin $adminhtmlSales,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\Stdlib\DateTime\DateTime $date,
@@ -344,7 +344,9 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
             ['product_collection' => $productCollection]
         );
 
-        $checkInStock = $this->_productInStock && !$this->stockConfiguration->isShowOutOfStock();
+        $checkInStock = $this->_productInStock
+            && $this->stockConfiguration !== null
+            && !$this->stockConfiguration->isShowOutOfStock();
 
         /** @var \Magento\Wishlist\Model\Item $item */
         foreach ($this as $item) {
@@ -380,7 +382,11 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
         $mainTableName = 'main_table';
         $connection = $this->getConnection();
 
-        if ($this->_productInStock && !$this->stockConfiguration->isShowOutOfStock()) {
+        if ($this->_productInStock
+            && $this->stockConfiguration !== null
+            && !$this->stockConfiguration->isShowOutOfStock()
+            && $this->stockStatusFilter !== null
+        ) {
             $this->joinProductTable();
             $this->stockStatusFilter->execute($this->getSelect(), 'product_entity', 'stockItem');
         }

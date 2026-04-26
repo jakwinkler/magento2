@@ -28,9 +28,9 @@ class AllowedQuantity implements ArgumentInterface
     private $item;
 
     /**
-     * @param StockRegistry $stockRegistry
+     * @param StockRegistry|null $stockRegistry
      */
-    public function __construct(StockRegistry $stockRegistry)
+    public function __construct(?StockRegistry $stockRegistry = null)
     {
         $this->stockRegistry = $stockRegistry;
     }
@@ -64,6 +64,13 @@ class AllowedQuantity implements ArgumentInterface
      */
     public function getMinMaxQty(): array
     {
+        if ($this->stockRegistry === null) {
+            return [
+                'minAllowed' => 1.0,
+                'maxAllowed' => (float)StockDataFilter::MAX_QTY_VALUE,
+            ];
+        }
+
         $product = $this->getItem()->getProduct();
         $stockItem = $this->stockRegistry->getStockItem($product->getId(), $product->getStore()->getWebsiteId());
         $params = [];

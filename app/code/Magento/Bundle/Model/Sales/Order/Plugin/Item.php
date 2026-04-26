@@ -6,6 +6,8 @@
 
 namespace Magento\Bundle\Model\Sales\Order\Plugin;
 
+use Magento\Bundle\Model\Product\Type as BundleType;
+
 /**
  * Plugin to calculate bundle item qty available for cancel
  */
@@ -20,8 +22,8 @@ class Item
      */
     public function afterGetQtyToCancel(\Magento\Sales\Model\Order\Item $subject, $result)
     {
-        if ($subject->getProductType() === \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE || $subject->getParentItem()
-            && $subject->getParentItem()->getProductType() === \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE
+        if ($subject->getProductType() === BundleType::TYPE_CODE || $subject->getParentItem()
+            && $subject->getParentItem()->getProductType() === BundleType::TYPE_CODE
         ) {
             $qtyToCancel = $this->getQtyToCancelBundle($subject);
             return max($qtyToCancel, 0);
@@ -38,8 +40,8 @@ class Item
      */
     public function afterIsProcessingAvailable(\Magento\Sales\Model\Order\Item $subject, $result)
     {
-        if ($subject->getProductType() === \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE || $subject->getParentItem()
-            && $subject->getParentItem()->getProductType() === \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE
+        if ($subject->getProductType() === BundleType::TYPE_CODE || $subject->getParentItem()
+            && $subject->getParentItem()->getProductType() === BundleType::TYPE_CODE
         ) {
             return $subject->getSimpleQtyToShip() > $subject->getQtyToCancel();
         }

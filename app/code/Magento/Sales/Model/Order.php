@@ -5,7 +5,7 @@
  */
 namespace Magento\Sales\Model;
 
-use Magento\Catalog\Model\Product\Type;
+use Magento\Catalog\Model\Product\Type\AbstractType;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Config\Model\Config\Source\Nooptreq;
@@ -887,12 +887,15 @@ class Order extends AbstractModel implements EntityInterface, OrderInterface
     private function checkItemShipping(): bool
     {
         foreach ($this->getAllItems() as $item) {
-            if (!$item->getParentItem() || $item->getParentItem()->getProductType() !== Type::TYPE_BUNDLE) {
+            $parentItem = $item->getParentItem();
+            if (!$parentItem || !$parentItem->getHasChildren()) {
                 $qtyToShip = $item->getQtyToShip();
             } else {
-                if ($item->getParentItem()->getProductType() === Type::TYPE_BUNDLE &&
-                    $item->getParentItem()->getProduct()->getShipmentType() == Type\AbstractType::SHIPMENT_TOGETHER) {
-                    $qtyToShip = $item->getParentItem()->getQtyToShip();
+                $parentProduct = $parentItem->getProduct();
+                if ($parentProduct
+                    && (int) $parentProduct->getShipmentType() === AbstractType::SHIPMENT_TOGETHER
+                ) {
+                    $qtyToShip = $parentItem->getQtyToShip();
                 } else {
                     $qtyToShip = $item->getSimpleQtyToShip();
                 }

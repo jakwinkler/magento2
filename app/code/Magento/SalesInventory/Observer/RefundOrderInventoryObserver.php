@@ -50,17 +50,17 @@ class RefundOrderInventoryObserver implements ObserverInterface
 
     /**
      * RefundOrderInventoryObserver constructor.
-     * @param StockConfigurationInterface $stockConfiguration
-     * @param StockManagementInterface $stockManagement
-     * @param \Magento\CatalogInventory\Model\Indexer\Stock\Processor $stockIndexerProcessor
+     * @param StockConfigurationInterface|null $stockConfiguration
+     * @param StockManagementInterface|null $stockManagement
+     * @param \Magento\CatalogInventory\Model\Indexer\Stock\Processor|null $stockIndexerProcessor
      * @param \Magento\Catalog\Model\Indexer\Product\Price\Processor $priceIndexer
      * @param ReturnProcessor $returnProcessor
      * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
      */
     public function __construct(
-        StockConfigurationInterface $stockConfiguration,
-        StockManagementInterface $stockManagement,
-        \Magento\CatalogInventory\Model\Indexer\Stock\Processor $stockIndexerProcessor,
+        ?StockConfigurationInterface $stockConfiguration,
+        ?StockManagementInterface $stockManagement,
+        ?\Magento\CatalogInventory\Model\Indexer\Stock\Processor $stockIndexerProcessor,
         \Magento\Catalog\Model\Indexer\Product\Price\Processor $priceIndexer,
         \Magento\SalesInventory\Model\Order\ReturnProcessor $returnProcessor,
         \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
@@ -81,6 +81,10 @@ class RefundOrderInventoryObserver implements ObserverInterface
      */
     public function execute(EventObserver $observer)
     {
+        if ($this->stockConfiguration === null || $this->stockManagement === null) {
+            return;
+        }
+
         /* @var $creditmemo \Magento\Sales\Model\Order\Creditmemo */
         $creditmemo = $observer->getEvent()->getCreditmemo();
         $order = $this->orderRepository->get($creditmemo->getOrderId());

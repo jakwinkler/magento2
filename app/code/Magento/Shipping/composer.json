@@ -10,7 +10,6 @@
         "magento/framework": "*",
         "magento/module-backend": "*",
         "magento/module-catalog": "*",
-        "magento/module-catalog-inventory": "*",
         "magento/module-contact": "*",
         "magento/module-customer": "*",
         "magento/module-directory": "*",

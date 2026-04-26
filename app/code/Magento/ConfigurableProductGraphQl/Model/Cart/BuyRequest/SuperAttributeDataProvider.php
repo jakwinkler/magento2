@@ -62,7 +62,7 @@ class SuperAttributeDataProvider implements BuyRequestDataProviderInterface
      * @param ProductRepositoryInterface $productRepository
      * @param OptionCollection $optionCollection
      * @param MetadataPool $metadataPool
-     * @param StockStateInterface $stockState
+     * @param StockStateInterface|null $stockState
      * @param ArrayManagerFactory|null $arrayManagerFactory
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
@@ -71,7 +71,7 @@ class SuperAttributeDataProvider implements BuyRequestDataProviderInterface
         ProductRepositoryInterface $productRepository,
         OptionCollection $optionCollection,
         MetadataPool $metadataPool,
-        StockStateInterface $stockState,
+        ?StockStateInterface $stockState = null,
         ?ArrayManagerFactory $arrayManagerFactory = null,
     ) {
         $this->arrayManagerFactory = $arrayManagerFactory
@@ -138,6 +138,10 @@ class SuperAttributeDataProvider implements BuyRequestDataProviderInterface
      */
     private function checkProductStock(string $sku, float $qty, int $scopeId): void
     {
+        if ($this->stockState === null) {
+            return;
+        }
+
         // Child stock check has to be performed a catalog by default would not show/check it
         $childProduct = $this->productRepository->get($sku, false, null, true);
 
