@@ -32,11 +32,13 @@ class StockProcessor implements CollectionProcessorInterface
     private $stockStatusResource;
 
     /**
-     * @param StockConfigurationInterface $stockConfig
-     * @param StockStatusResource $stockStatusResource
+     * @param StockConfigurationInterface|null $stockConfig
+     * @param StockStatusResource|null $stockStatusResource
      */
-    public function __construct(StockConfigurationInterface $stockConfig, StockStatusResource $stockStatusResource)
-    {
+    public function __construct(
+        ?StockConfigurationInterface $stockConfig = null,
+        ?StockStatusResource $stockStatusResource = null
+    ) {
         $this->stockConfig = $stockConfig;
         $this->stockStatusResource = $stockStatusResource;
     }
@@ -57,6 +59,10 @@ class StockProcessor implements CollectionProcessorInterface
         array $attributeNames,
         ?ContextInterface $context = null
     ): Collection {
+        if ($this->stockConfig === null || $this->stockStatusResource === null) {
+            return $collection;
+        }
+
         $stockFlag = 'has_stock_status_filter';
         if (!$collection->hasFlag($stockFlag)) {
             $this->stockStatusResource->addStockDataToCollection($collection, !$this->stockConfig->isShowOutOfStock());

@@ -12,7 +12,6 @@ use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\Email\Sender\CreditmemoSender;
 use Magento\Catalog\Model\Product\Type\AbstractType;
 use Magento\Sales\Model\Order\Creditmemo\Item;
-use Magento\Catalog\Model\Product\Type;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -190,7 +189,7 @@ class Save extends \Magento\Backend\App\Action implements HttpPostActionInterfac
     private function shouldSkipQuantityAccumulation(Item $item): bool
     {
         $parentOrderItem = $item->getOrderItem()->getParentItem();
-        if (!$parentOrderItem || $parentOrderItem->getProductType() !== Type::TYPE_BUNDLE) {
+        if (!$parentOrderItem || !$parentOrderItem->getHasChildren()) {
             return false;
         }
         $parentOptions = $parentOrderItem->getProductOptions();

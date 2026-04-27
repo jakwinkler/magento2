@@ -32,11 +32,11 @@ class StockDataFilter
 
     /**
      * @param ScopeConfigInterface $scopeConfig
-     * @param StockConfigurationInterface $stockConfiguration
+     * @param StockConfigurationInterface|null $stockConfiguration
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
-        StockConfigurationInterface $stockConfiguration
+        ?StockConfigurationInterface $stockConfiguration = null
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->stockConfiguration = $stockConfiguration;
@@ -51,6 +51,10 @@ class StockDataFilter
      */
     public function filter(array $stockData)
     {
+        if ($this->stockConfiguration === null) {
+            return $stockData;
+        }
+
         if (!isset($stockData['use_config_manage_stock'])) {
             $stockData['use_config_manage_stock'] = 0;
         }

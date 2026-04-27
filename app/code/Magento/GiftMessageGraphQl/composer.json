@@ -9,7 +9,6 @@
         "magento/module-catalog": "*",
         "magento/module-quote": "*",
         "magento/module-store": "*",
-        "magento/module-downloadable": "*",
         "magento/module-sales": "*"
     },
     "suggest": {

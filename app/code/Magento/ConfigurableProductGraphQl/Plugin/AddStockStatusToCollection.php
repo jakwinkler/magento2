@@ -21,10 +21,10 @@ class AddStockStatusToCollection
     private $stockStatusResourceModel;
 
     /**
-     * @param Status $stockStatusResourceModel
+     * @param Status|null $stockStatusResourceModel
      */
     public function __construct(
-        Status $stockStatusResourceModel
+        ?Status $stockStatusResourceModel = null
     ) {
         $this->stockStatusResourceModel = $stockStatusResourceModel;
     }
@@ -39,6 +39,10 @@ class AddStockStatusToCollection
      */
     public function beforeLoad(Collection $productCollection, $printQuery = false, $logQuery = false): array
     {
+        if ($this->stockStatusResourceModel === null) {
+            return [$printQuery, $logQuery];
+        }
+
         $stockFlag = 'has_stock_status_filter';
         if (!$productCollection->hasFlag($stockFlag)) {
             $this->stockStatusResourceModel->addStockDataToCollection($productCollection, false);

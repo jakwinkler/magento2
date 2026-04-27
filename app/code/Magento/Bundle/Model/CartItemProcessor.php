@@ -5,10 +5,11 @@
  */
 namespace Magento\Bundle\Model;
 
-use Magento\Quote\Model\Quote\Item\CartItemProcessorInterface;
-use Magento\Quote\Api\Data\CartItemInterface;
 use Magento\Bundle\Api\Data\BundleOptionInterfaceFactory;
+use Magento\Bundle\Model\Product\Type as BundleType;
 use Magento\Quote\Api\Data as QuoteApi;
+use Magento\Quote\Api\Data\CartItemInterface;
+use Magento\Quote\Model\Quote\Item\CartItemProcessorInterface;
 
 class CartItemProcessor implements CartItemProcessorInterface
 {
@@ -78,7 +79,7 @@ class CartItemProcessor implements CartItemProcessorInterface
      */
     public function processOptions(CartItemInterface $cartItem)
     {
-        if ($cartItem->getProductType() !== \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE) {
+        if ($cartItem->getProductType() !== BundleType::TYPE_CODE) {
             return $cartItem;
         }
         $productOptions = [];

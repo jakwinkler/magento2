@@ -877,7 +877,7 @@ class CategorySetup extends EavSetup
                         'comparable' => false,
                         'visible_on_front' => false,
                         'unique' => false,
-                        'apply_to' => 'simple,bundle',
+                        'apply_to' => 'simple',
                         'group' => 'General',
                         'is_used_in_grid' => true,
                         'is_visible_in_grid' => false,

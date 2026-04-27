@@ -26,6 +26,10 @@ class Type implements OptionSourceInterface, ResetAfterRequestInterface
 {
     public const TYPE_SIMPLE = 'simple';
 
+    /**
+     * @deprecated Use \Magento\Bundle\Model\Product\Type::TYPE_CODE instead
+     * @see \Magento\Bundle\Model\Product\Type::TYPE_CODE
+     */
     public const TYPE_BUNDLE = 'bundle';
 
     public const TYPE_VIRTUAL = 'virtual';

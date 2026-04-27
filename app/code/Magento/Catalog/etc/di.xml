@@ -983,26 +983,24 @@
     <type name="Magento\Catalog\Model\Product\Price\BasePriceStorage">
         <arguments>
             <argument name="allowedProductTypes" xsi:type="array">
-                <item name="0" xsi:type="string">simple</item>
-                <item name="1" xsi:type="string">virtual</item>
-                <item name="2" xsi:type="string">bundle</item>
+                <item name="simple" xsi:type="string">simple</item>
+                <item name="virtual" xsi:type="string">virtual</item>
             </argument>
         </arguments>
     </type>
     <type name="Magento\Catalog\Model\Product\Price\Validation\TierPriceValidator">
         <arguments>
             <argument name="allowedProductTypes" xsi:type="array">
-                <item name="0" xsi:type="string">simple</item>
-                <item name="1" xsi:type="string">virtual</item>
-                <item name="2" xsi:type="string">bundle</item>
+                <item name="simple" xsi:type="string">simple</item>
+                <item name="virtual" xsi:type="string">virtual</item>
             </argument>
         </arguments>
     </type>
     <type name="Magento\Catalog\Model\Product\Price\SpecialPriceStorage">
         <arguments>
             <argument name="allowedProductTypes" xsi:type="array">
-                <item name="0" xsi:type="string">simple</item>
-                <item name="1" xsi:type="string">virtual</item>
+                <item name="simple" xsi:type="string">simple</item>
+                <item name="virtual" xsi:type="string">virtual</item>
             </argument>
         </arguments>
     </type>
@@ -1402,6 +1400,21 @@
         <arguments>
             <argument name="imageContentProcessor" xsi:type="object">Magento\Catalog\Model\Product\Option\Type\File\ImageContentProcessor\Proxy</argument>
             <argument name="productRepository" xsi:type="object">Magento\Catalog\Api\ProductRepositoryInterface\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Magento\Catalog\Model\Product\Option\SaveHandler">
+        <arguments>
+            <argument name="compositeProductTypes" xsi:type="array" />
+        </arguments>
+    </type>
+    <type name="Magento\Catalog\Model\Product\Price\Validation\InvalidSkuProcessor">
+        <arguments>
+            <argument name="priceTypeRestrictedTypes" xsi:type="array" />
+        </arguments>
+    </type>
+    <type name="Magento\Catalog\Model\Product\Price\Validation\TierPriceValidator">
+        <arguments>
+            <argument name="discountOnlyPriceTypes" xsi:type="array" />
         </arguments>
     </type>
 </config>

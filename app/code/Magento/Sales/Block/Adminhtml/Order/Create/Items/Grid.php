@@ -65,6 +65,13 @@ class Grid extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractCreate
     protected $stockState;
 
     /**
+     * Product types where tier price is a percentage discount rather than fixed price.
+     *
+     * @var array
+     */
+    private array $discountTierPriceTypes;
+
+    /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Backend\Model\Session\Quote $sessionQuote
      * @param \Magento\Sales\Model\AdminOrder\Create $orderCreate
@@ -74,10 +81,11 @@ class Grid extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractCreate
      * @param \Magento\Tax\Model\Config $taxConfig
      * @param \Magento\Tax\Helper\Data $taxData
      * @param \Magento\GiftMessage\Helper\Message $messageHelper
-     * @param StockRegistryInterface $stockRegistry
-     * @param StockStateInterface $stockState
+     * @param StockRegistryInterface|null $stockRegistry
+     * @param StockStateInterface|null $stockState
      * @param array $data
      * @param CatalogHelper|null $catalogHelper
+     * @param array $discountTierPriceTypes Product types with percentage-based tier prices
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -90,10 +98,11 @@ class Grid extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractCreate
         \Magento\Tax\Model\Config $taxConfig,
         \Magento\Tax\Helper\Data $taxData,
         \Magento\GiftMessage\Helper\Message $messageHelper,
-        StockRegistryInterface $stockRegistry,
-        StockStateInterface $stockState,
+        ?StockRegistryInterface $stockRegistry = null,
+        ?StockStateInterface $stockState = null,
         array $data = [],
-        ?CatalogHelper $catalogHelper = null
+        ?CatalogHelper $catalogHelper = null,
+        array $discountTierPriceTypes = []
     ) {
         $this->_messageHelper = $messageHelper;
         $this->_wishlistFactory = $wishlistFactory;
@@ -102,6 +111,7 @@ class Grid extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractCreate
         $this->_taxData = $taxData;
         $this->stockRegistry = $stockRegistry;
         $this->stockState = $stockState;
+        $this->discountTierPriceTypes = $discountTierPriceTypes;
         $data['catalogHelper'] = $catalogHelper ?? ObjectManager::getInstance()->get(CatalogHelper::class);
         parent::__construct($context, $sessionQuote, $orderCreate, $priceCurrency, $data);
     }
@@ -131,7 +141,7 @@ class Grid extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractCreate
             // To dispatch inventory event sales_quote_item_qty_set_after, set item qty
             $item->setQty($item->getQty());
 
-            if (!$item->getMessage()) {
+            if (!$item->getMessage() && $this->stockState !== null) {
                 //Getting product ids for stock item last quantity validation before grid display
                 $stockItemToCheck = [];
 
@@ -373,8 +383,8 @@ class Grid extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractCreate
         $html = '';
         $prices = $item->getProduct()->getTierPrice();
         if ($prices) {
-            if ($item->getProductType() == \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE) {
-                $info = $this->_getBundleTierPriceInfo($prices);
+            if (in_array($item->getProductType(), $this->discountTierPriceTypes, true)) {
+                $info = $this->_getDiscountTierPriceInfo($prices);
             } else {
                 $info = $this->_getTierPriceInfo($prices);
             }
@@ -385,12 +395,12 @@ class Grid extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractCreate
     }
 
     /**
-     * Get tier price info to display in grid for Bundle product
+     * Get tier price info to display in grid for product types with percentage-based tier prices
      *
      * @param array $prices
      * @return string[]
      */
-    protected function _getBundleTierPriceInfo($prices)
+    protected function _getDiscountTierPriceInfo($prices)
     {
         $info = [];
         foreach ($prices as $data) {

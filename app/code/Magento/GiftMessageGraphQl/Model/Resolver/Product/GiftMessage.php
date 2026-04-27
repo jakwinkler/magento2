@@ -8,8 +8,6 @@ declare(strict_types=1);
 namespace Magento\GiftMessageGraphQl\Model\Resolver\Product;
 
 use Magento\Catalog\Api\Data\ProductInterface;
-use Magento\Catalog\Model\Product\Type as Virtual;
-use Magento\Downloadable\Model\Product\Type as Downloadable;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
@@ -19,11 +17,21 @@ use Magento\GiftMessageGraphQl\Model\Config\Messages;
 class GiftMessage implements ResolverInterface
 {
     /**
-     * @param Messages $messagesConfig
+     * Product types that do not support gift messages.
+     *
+     * @var array
+     */
+    private array $nonGiftMessageProductTypes;
+
+    /**
+     * @param \Magento\GiftMessageGraphQl\Model\Config\Messages $messagesConfig
+     * @param array $nonGiftMessageProductTypes
      */
     public function __construct(
-        private readonly Messages $messagesConfig
+        private readonly Messages $messagesConfig,
+        array $nonGiftMessageProductTypes = []
     ) {
+        $this->nonGiftMessageProductTypes = $nonGiftMessageProductTypes;
     }
 
     /**
@@ -40,7 +48,7 @@ class GiftMessage implements ResolverInterface
             throw new LocalizedException(__('The product model is not available.'));
         }
 
-        if (in_array($value['model']['type_id'], [Virtual::TYPE_VIRTUAL, Downloadable::TYPE_DOWNLOADABLE], true)) {
+        if (in_array($value['model']['type_id'], $this->nonGiftMessageProductTypes, true)) {
             return false;
         }
 

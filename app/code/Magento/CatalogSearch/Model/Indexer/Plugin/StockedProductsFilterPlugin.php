@@ -37,14 +37,14 @@ class StockedProductsFilterPlugin
     private $stockStatusCriteriaFactory;
 
     /**
-     * @param StockConfigurationInterface $stockConfiguration
-     * @param StockStatusRepositoryInterface $stockStatusRepository
-     * @param StockStatusCriteriaInterfaceFactory $stockStatusCriteriaFactory
+     * @param StockConfigurationInterface|null $stockConfiguration
+     * @param StockStatusRepositoryInterface|null $stockStatusRepository
+     * @param StockStatusCriteriaInterfaceFactory|null $stockStatusCriteriaFactory
      */
     public function __construct(
-        StockConfigurationInterface $stockConfiguration,
-        StockStatusRepositoryInterface $stockStatusRepository,
-        StockStatusCriteriaInterfaceFactory $stockStatusCriteriaFactory
+        ?StockConfigurationInterface $stockConfiguration = null,
+        ?StockStatusRepositoryInterface $stockStatusRepository = null,
+        ?StockStatusCriteriaInterfaceFactory $stockStatusCriteriaFactory = null
     ) {
         $this->stockConfiguration = $stockConfiguration;
         $this->stockStatusRepository = $stockStatusRepository;
@@ -67,6 +67,13 @@ class StockedProductsFilterPlugin
         array $productData,
         int $storeId
     ): array {
+        if ($this->stockConfiguration === null
+            || $this->stockStatusRepository === null
+            || $this->stockStatusCriteriaFactory === null
+        ) {
+            return [$indexData, $productData, $storeId];
+        }
+
         if (!$this->stockConfiguration->isShowOutOfStock($storeId)) {
             $productIds = array_keys($indexData);
             $stockStatusCriteria = $this->stockStatusCriteriaFactory->create();

@@ -10,7 +10,6 @@
         "magento/module-backend": "*",
         "magento/module-catalog": "*",
         "magento/module-catalog-import-export": "*",
-        "magento/module-catalog-inventory": "*",
         "magento/module-customer": "*",
         "magento/module-eav": "*",
         "magento/module-import-export": "*",

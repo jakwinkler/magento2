@@ -108,7 +108,7 @@ class ConfiguredPriceBox extends FinalPriceBox
      */
     public function getConfiguredPrice(): PriceInterface
     {
-        /** @var \Magento\Bundle\Pricing\Price\ConfiguredPrice $configuredPrice */
+        /** @var \Magento\Catalog\Pricing\Price\ConfiguredPriceInterface $configuredPrice */
         $configuredPrice = $this->getPrice();
         if (empty($this->configuredPriceSelection->getSelectionPriceList($configuredPrice))) {
             // If there was no selection we must show minimal regular price
@@ -125,7 +125,7 @@ class ConfiguredPriceBox extends FinalPriceBox
      */
     public function getConfiguredRegularPrice(): PriceInterface
     {
-        /** @var \Magento\Bundle\Pricing\Price\ConfiguredPrice $configuredPrice */
+        /** @var \Magento\Catalog\Pricing\Price\ConfiguredPriceInterface $configuredPrice */
         $configuredPrice = $this->getPriceType(ConfiguredPriceInterface::CONFIGURED_REGULAR_PRICE_CODE);
         if (empty($this->configuredPriceSelection->getSelectionPriceList($configuredPrice))) {
             // If there was no selection we must show minimal regular price

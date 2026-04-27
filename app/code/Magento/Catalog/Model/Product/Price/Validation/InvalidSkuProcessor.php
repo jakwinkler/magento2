@@ -3,8 +3,12 @@
  * Copyright 2017 Adobe
  * All Rights Reserved.
  */
+declare(strict_types=1);
 
 namespace Magento\Catalog\Model\Product\Price\Validation;
+
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Model\ProductIdLocatorInterface;
 
 /**
  * Class is responsible to detect list of invalid SKU values from list of provided skus and allowed product types.
@@ -12,25 +16,15 @@ namespace Magento\Catalog\Model\Product\Price\Validation;
 class InvalidSkuProcessor
 {
     /**
-     * @var \Magento\Catalog\Model\ProductIdLocatorInterface
-     */
-    private $productIdLocator;
-
-    /**
-     * @var \Magento\Catalog\Api\ProductRepositoryInterface
-     */
-    private $productRepository;
-
-    /**
      * @param \Magento\Catalog\Model\ProductIdLocatorInterface $productIdLocator
      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+     * @param array $priceTypeRestrictedTypes Product types that require price type validation
      */
     public function __construct(
-        \Magento\Catalog\Model\ProductIdLocatorInterface $productIdLocator,
-        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+        private readonly ProductIdLocatorInterface $productIdLocator,
+        private readonly ProductRepositoryInterface $productRepository,
+        private readonly array $priceTypeRestrictedTypes = []
     ) {
-        $this->productIdLocator = $productIdLocator;
-        $this->productRepository = $productRepository;
     }
 
     /**
@@ -56,7 +50,7 @@ class InvalidSkuProcessor
                 $valueTypeIsAllowed = false;
 
                 if ($allowedPriceTypeValue
-                    && $type == \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE
+                    && in_array($type, $this->priceTypeRestrictedTypes, true)
                     && $this->productRepository->get($sku)->getPriceType() != $allowedPriceTypeValue
                 ) {
                     $valueTypeIsAllowed = true;

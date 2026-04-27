@@ -6,6 +6,7 @@
 
 namespace Magento\Bundle\Model;
 
+use Magento\Bundle\Model\Product\Type as BundleType;
 use Magento\Framework\Exception\InputException;
 
 class OptionManagement implements \Magento\Bundle\Api\ProductOptionManagementInterface
@@ -38,7 +39,7 @@ class OptionManagement implements \Magento\Bundle\Api\ProductOptionManagementInt
     public function save(\Magento\Bundle\Api\Data\OptionInterface $option)
     {
         $product = $this->productRepository->get($option->getSku(), true);
-        if ($product->getTypeId() != \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE) {
+        if ($product->getTypeId() != BundleType::TYPE_CODE) {
             throw new InputException(__('This is implemented for bundle products only.'));
         }
         return $this->optionRepository->save($product, $option);

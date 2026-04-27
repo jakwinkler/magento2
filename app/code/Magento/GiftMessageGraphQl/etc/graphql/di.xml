@@ -15,4 +15,12 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\GiftMessageGraphQl\Model\Resolver\Product\GiftMessage">
+        <arguments>
+            <argument name="nonGiftMessageProductTypes" xsi:type="array">
+                <item name="virtual" xsi:type="string">virtual</item>
+                <item name="downloadable" xsi:type="string">downloadable</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

@@ -122,7 +122,7 @@ abstract class AbstractCarrierOnline extends AbstractCarrier
      * @param \Magento\Directory\Model\CountryFactory $countryFactory
      * @param \Magento\Directory\Model\CurrencyFactory $currencyFactory
      * @param \Magento\Directory\Helper\Data $directoryData
-     * @param \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry
+     * @param \Magento\CatalogInventory\Api\StockRegistryInterface|null $stockRegistry
      * @param array $data
      *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
@@ -142,7 +142,7 @@ abstract class AbstractCarrierOnline extends AbstractCarrier
         \Magento\Directory\Model\CountryFactory $countryFactory,
         \Magento\Directory\Model\CurrencyFactory $currencyFactory,
         \Magento\Directory\Helper\Data $directoryData,
-        \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
+        ?\Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry = null,
         array $data = []
     ) {
         $this->_xmlElFactory = $xmlElFactory;
@@ -329,21 +329,24 @@ abstract class AbstractCarrierOnline extends AbstractCarrier
             $product = $item->getProduct();
             if ($product && $product->getId()) {
                 $weight = $product->getWeight();
-                $stockItemData = $this->stockRegistry->getStockItem(
-                    $product->getId(),
-                    $item->getStore()->getWebsiteId()
-                );
                 $doValidation = true;
 
-                if ($stockItemData->getIsQtyDecimal() && $stockItemData->getIsDecimalDivided()) {
-                    if ($stockItemData->getEnableQtyIncrements() && $stockItemData->getQtyIncrements()
-                    ) {
-                        $weight = $weight * $stockItemData->getQtyIncrements();
-                    } else {
-                        $doValidation = false;
+                if ($this->stockRegistry !== null) {
+                    $stockItemData = $this->stockRegistry->getStockItem(
+                        $product->getId(),
+                        $item->getStore()->getWebsiteId()
+                    );
+
+                    if ($stockItemData->getIsQtyDecimal() && $stockItemData->getIsDecimalDivided()) {
+                        if ($stockItemData->getEnableQtyIncrements() && $stockItemData->getQtyIncrements()
+                        ) {
+                            $weight = $weight * $stockItemData->getQtyIncrements();
+                        } else {
+                            $doValidation = false;
+                        }
+                    } elseif ($stockItemData->getIsQtyDecimal() && !$stockItemData->getIsDecimalDivided()) {
+                        $weight = $weight * $item->getQty();
                     }
-                } elseif ($stockItemData->getIsQtyDecimal() && !$stockItemData->getIsDecimalDivided()) {
-                    $weight = $weight * $item->getQty();
                 }
 
                 if ($doValidation && $weight > $maxAllowedWeight) {

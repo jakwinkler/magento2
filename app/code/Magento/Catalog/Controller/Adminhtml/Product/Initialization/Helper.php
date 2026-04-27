@@ -202,10 +202,6 @@ class Helper
 
         $productData = $this->normalize($productData);
 
-        if (!empty($productData['is_downloadable'])) {
-            $productData['product_has_weight'] = 0;
-        }
-
         foreach (['category_ids', 'website_ids'] as $field) {
             if (!isset($productData[$field])) {
                 $productData[$field] = [];

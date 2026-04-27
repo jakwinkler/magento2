@@ -8,7 +8,6 @@ namespace Magento\Dhl\Model;
 
 use Exception;
 use Laminas\Http\Request as HttpRequest;
-use Magento\Catalog\Model\Product\Type;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Dhl\Model\Validator\XmlValidator;
 use Magento\Directory\Helper\Data;
@@ -293,7 +292,7 @@ class Carrier extends AbstractDhl implements CarrierInterface
      * @param CountryFactory $countryFactory
      * @param CurrencyFactory $currencyFactory
      * @param Data $directoryData
-     * @param StockRegistryInterface $stockRegistry
+     * @param StockRegistryInterface|null $stockRegistry
      * @param \Magento\Shipping\Helper\Carrier $carrierHelper
      * @param \Magento\Framework\Stdlib\DateTime\DateTime $coreDate
      * @param Reader $configReader
@@ -325,7 +324,7 @@ class Carrier extends AbstractDhl implements CarrierInterface
         CountryFactory $countryFactory,
         CurrencyFactory $currencyFactory,
         Data $directoryData,
-        StockRegistryInterface $stockRegistry,
+        ?StockRegistryInterface $stockRegistry,
         \Magento\Shipping\Helper\Carrier $carrierHelper,
         \Magento\Framework\Stdlib\DateTime\DateTime $coreDate,
         Reader $configReader,
@@ -806,7 +805,7 @@ class Carrier extends AbstractDhl implements CarrierInterface
         $fullItems = [];
 
         foreach ($allItems as $item) {
-            if ($item->getProductType() == Type::TYPE_BUNDLE && $item->getProduct()->getShipmentType()) {
+            if ($item->getHasChildren() && $item->getProduct()->getShipmentType()) {
                 continue;
             }
 
@@ -827,29 +826,36 @@ class Carrier extends AbstractDhl implements CarrierInterface
             }
 
             $itemWeight = $item->getWeight();
-            if ($item->getIsQtyDecimal() && $item->getProductType() != Type::TYPE_BUNDLE) {
-                $productId = $item->getProduct()->getId();
-                $stockItemDo = $this->stockRegistry->getStockItem($productId, $item->getStore()->getWebsiteId());
-                $isDecimalDivided = $stockItemDo->getIsDecimalDivided();
-                if ($isDecimalDivided) {
-                    if ($stockItemDo->getEnableQtyIncrements()
-                        && $stockItemDo->getQtyIncrements()
-                    ) {
-                        $itemWeight = $itemWeight * $stockItemDo->getQtyIncrements();
-                        $qty = round($item->getWeight() / $itemWeight * $qty);
-                        $changeQty = false;
-                    } else {
-                        $itemWeight = $this->_getWeight($itemWeight * $item->getQty());
-                        $maxWeight = $this->_getWeight($this->_maxWeight, true);
-                        if ($itemWeight > $maxWeight) {
-                            $qtyItem = floor($itemWeight / $maxWeight);
-                            $decimalItems[] = ['weight' => $maxWeight, 'qty' => $qtyItem];
-                            $weightItem = $this->mathDivision->getExactDivision($itemWeight, $maxWeight);
-                            if ($weightItem) {
-                                $decimalItems[] = ['weight' => $weightItem, 'qty' => 1];
+            if ($item->getIsQtyDecimal() && !$item->getHasChildren()) {
+                if ($this->stockRegistry !== null) {
+                    $productId = $item->getProduct()->getId();
+                    $stockItemDo = $this->stockRegistry->getStockItem(
+                        $productId,
+                        $item->getStore()->getWebsiteId()
+                    );
+                    $isDecimalDivided = $stockItemDo->getIsDecimalDivided();
+                    if ($isDecimalDivided) {
+                        if ($stockItemDo->getEnableQtyIncrements()
+                            && $stockItemDo->getQtyIncrements()
+                        ) {
+                            $itemWeight = $itemWeight * $stockItemDo->getQtyIncrements();
+                            $qty = round($item->getWeight() / $itemWeight * $qty);
+                            $changeQty = false;
+                        } else {
+                            $itemWeight = $this->_getWeight($itemWeight * $item->getQty());
+                            $maxWeight = $this->_getWeight($this->_maxWeight, true);
+                            if ($itemWeight > $maxWeight) {
+                                $qtyItem = floor($itemWeight / $maxWeight);
+                                $decimalItems[] = ['weight' => $maxWeight, 'qty' => $qtyItem];
+                                $weightItem = $this->mathDivision->getExactDivision($itemWeight, $maxWeight);
+                                if ($weightItem) {
+                                    $decimalItems[] = ['weight' => $weightItem, 'qty' => 1];
+                                }
+                                $checkWeight = false;
                             }
-                            $checkWeight = false;
                         }
+                    } else {
+                        $itemWeight = $itemWeight * $item->getQty();
                     }
                 } else {
                     $itemWeight = $itemWeight * $item->getQty();
@@ -863,7 +869,7 @@ class Carrier extends AbstractDhl implements CarrierInterface
             if ($changeQty
                 && !$item->getParentItem()
                 && $item->getIsQtyDecimal()
-                && $item->getProductType() != Type::TYPE_BUNDLE
+                && !$item->getHasChildren()
             ) {
                 $qty = 1;
             }

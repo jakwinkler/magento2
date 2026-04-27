@@ -28,7 +28,7 @@ class AddProductsToCart
      * @param BuyRequestBuilder $requestBuilder
      * @param ProductReaderInterface $productReader
      * @param AddProductsToCartError $error
-     * @param StockRegistryInterface $stockRegistry
+     * @param StockRegistryInterface|null $stockRegistry
      */
     public function __construct(
         private readonly CartRepositoryInterface $cartRepository,
@@ -36,7 +36,7 @@ class AddProductsToCart
         private readonly BuyRequestBuilder $requestBuilder,
         private readonly ProductReaderInterface $productReader,
         private readonly AddProductsToCartError $error,
-        private readonly StockRegistryInterface $stockRegistry
+        private readonly ?StockRegistryInterface $stockRegistry = null
     ) {
     }
 
@@ -103,7 +103,7 @@ class AddProductsToCart
         foreach ($cartItems as $cartItemPosition => $cartItem) {
             $product = $this->productReader->getProductBySku($cartItem->getSku());
             $stockItemQuantity = 0.0;
-            if ($product) {
+            if ($product && $this->stockRegistry !== null) {
                 $stockItem = $this->stockRegistry->getStockItem(
                     $product->getId(),
                     $cart->getStore()->getWebsiteId()

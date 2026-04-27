@@ -6,10 +6,9 @@
 
 namespace Magento\Sales\Model\ResourceModel\Order\Handler;
 
+use Magento\Catalog\Model\Product\Type\AbstractType;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Invoice;
-use Magento\Catalog\Model\Product\Type;
-use Magento\Catalog\Model\Product\Type\AbstractType;
 
 /**
  * Checking order status and adjusting order status before saving
@@ -127,18 +126,13 @@ class State
                 continue;
             }
 
-            // For bundle shipped together, evaluate fulfillment using the parent only
+            // For composite products shipped together, evaluate fulfillment using the parent only
             $parentItem = $item->getParentItem();
-            if ($parentItem && $parentItem->getProductType() === Type::TYPE_BUNDLE) {
-                $parentProduct = $parentItem->getProduct();
-                if ($parentProduct && $parentProduct->getShipmentType() == AbstractType::SHIPMENT_TOGETHER) {
-                    continue;
-                }
+            if ($parentItem && $this->isShippedTogether($parentItem)) {
+                continue;
             }
 
-            $subject = $parentItem && $parentItem->getProductType() === Type::TYPE_BUNDLE
-            && $parentItem->getProduct()
-            && $parentItem->getProduct()->getShipmentType() == AbstractType::SHIPMENT_TOGETHER
+            $subject = $parentItem && $this->isShippedTogether($parentItem)
                 ? $parentItem
                 : $item;
 
@@ -170,5 +164,19 @@ class State
         }
 
         return false;
+    }
+
+    /**
+     * Check if an order item's product is a composite type shipped together
+     *
+     * @param \Magento\Sales\Model\Order\Item $item
+     * @return bool
+     */
+    private function isShippedTogether(\Magento\Sales\Model\Order\Item $item): bool
+    {
+        $product = $item->getProduct();
+        return $product
+            && $item->getHasChildren()
+            && (int) $product->getShipmentType() === AbstractType::SHIPMENT_TOGETHER;
     }
 }

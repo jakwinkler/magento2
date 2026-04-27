@@ -46,9 +46,7 @@ class Bestsellers extends AbstractReport
      *
      * @var array
      */
-    protected $ignoredProductTypes = [
-        \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE => \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE,
-    ];
+    protected $ignoredProductTypes = [];
 
     /**
      * @var StoreManagerInterface

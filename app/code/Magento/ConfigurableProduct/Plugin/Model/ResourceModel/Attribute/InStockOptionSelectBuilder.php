@@ -27,12 +27,12 @@ class InStockOptionSelectBuilder
     private $stockConfig;
 
     /**
-     * @param Status $stockStatusResource
-     * @param StockConfigurationInterface $stockConfig
+     * @param Status|null $stockStatusResource
+     * @param StockConfigurationInterface|null $stockConfig
      */
     public function __construct(
-        Status $stockStatusResource,
-        StockConfigurationInterface $stockConfig
+        ?Status $stockStatusResource = null,
+        ?StockConfigurationInterface $stockConfig = null
     ) {
         $this->stockStatusResource = $stockStatusResource;
         $this->stockConfig = $stockConfig;
@@ -49,7 +49,7 @@ class InStockOptionSelectBuilder
      */
     public function afterGetSelect(OptionSelectBuilderInterface $subject, Select $select)
     {
-        if (!$this->stockConfig->isShowOutOfStock()) {
+        if ($this->stockConfig !== null && $this->stockStatusResource !== null && !$this->stockConfig->isShowOutOfStock()) {
             $select->joinInner(
                 ['stock' => $this->stockStatusResource->getMainTable()],
                 'stock.product_id = entity.entity_id',

@@ -29,11 +29,11 @@ class Stock
 
     /**
      * @param ScopeConfigInterface $scopeConfig
-     * @param StockItemResourceModel $stockItemResourceModel
+     * @param StockItemResourceModel|null $stockItemResourceModel
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
-        StockItemResourceModel $stockItemResourceModel
+        ?StockItemResourceModel $stockItemResourceModel = null
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->stockItemResourceModel = $stockItemResourceModel;
@@ -47,6 +47,10 @@ class Stock
      */
     public function addInStockFilterToCollection(Collection $collection): Collection
     {
+        if ($this->stockItemResourceModel === null) {
+            return $collection;
+        }
+
         $manageStock = $this->scopeConfig->getValue(
             Configuration::XML_PATH_MANAGE_STOCK,
             ScopeInterface::SCOPE_STORE
@@ -72,6 +76,10 @@ class Stock
      */
     public function addOutOfStockFilterToCollection(Collection $collection): Collection
     {
+        if ($this->stockItemResourceModel === null) {
+            return $collection;
+        }
+
         $manageStock = $this->scopeConfig->getValue(
             Configuration::XML_PATH_MANAGE_STOCK,
             ScopeInterface::SCOPE_STORE

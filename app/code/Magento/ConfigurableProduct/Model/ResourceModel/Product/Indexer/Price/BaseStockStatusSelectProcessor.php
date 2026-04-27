@@ -32,11 +32,11 @@ class BaseStockStatusSelectProcessor implements BaseSelectProcessorInterface
 
     /**
      * @param ResourceConnection $resource
-     * @param StockConfigurationInterface $stockConfig
+     * @param StockConfigurationInterface|null $stockConfig
      */
     public function __construct(
         ResourceConnection $resource,
-        StockConfigurationInterface $stockConfig
+        ?StockConfigurationInterface $stockConfig = null
     ) {
         $this->resource = $resource;
         $this->stockConfig = $stockConfig;
@@ -48,7 +48,7 @@ class BaseStockStatusSelectProcessor implements BaseSelectProcessorInterface
     public function process(Select $select)
     {
         // Does not make sense to extend query if out of stock products won't appear in tables for indexing
-        if ($this->stockConfig->isShowOutOfStock()) {
+        if ($this->stockConfig !== null && $this->stockConfig->isShowOutOfStock()) {
             $stockIndexTableName = $this->resource->getTableName('cataloginventory_stock_status');
             $select->joinInner(
                 ['child_stock_default' => $stockIndexTableName],

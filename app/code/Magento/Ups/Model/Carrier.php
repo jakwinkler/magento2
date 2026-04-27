@@ -196,7 +196,7 @@ class Carrier extends AbstractCarrierOnline implements CarrierInterface
      * @param CountryFactory $countryFactory
      * @param CurrencyFactory $currencyFactory
      * @param Data $directoryData
-     * @param StockRegistryInterface $stockRegistry
+     * @param StockRegistryInterface|null $stockRegistry
      * @param FormatInterface $localeFormat
      * @param Config $configHelper
      * @param UpsAuth $upsAuth
@@ -223,7 +223,7 @@ class Carrier extends AbstractCarrierOnline implements CarrierInterface
         CountryFactory $countryFactory,
         CurrencyFactory $currencyFactory,
         Data $directoryData,
-        StockRegistryInterface $stockRegistry,
+        ?StockRegistryInterface $stockRegistry,
         FormatInterface $localeFormat,
         Config $configHelper,
         UpsAuth $upsAuth,

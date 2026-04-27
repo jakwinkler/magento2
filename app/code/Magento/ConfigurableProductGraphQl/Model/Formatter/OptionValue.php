@@ -29,11 +29,11 @@ class OptionValue
 
     /**
      * @param SelectionUidFormatter $selectionUidFormatter
-     * @param StockRegistry $stockRegistry
+     * @param StockRegistry|null $stockRegistry
      */
     public function __construct(
         SelectionUidFormatter $selectionUidFormatter,
-        StockRegistry $stockRegistry
+        ?StockRegistry $stockRegistry = null
     ) {
         $this->selectionUidFormatter = $selectionUidFormatter;
         $this->stockRegistry = $stockRegistry;
@@ -72,6 +72,10 @@ class OptionValue
      */
     private function getIsAvailable(array $variantIds): bool
     {
+        if ($this->stockRegistry === null) {
+            return true;
+        }
+
         foreach ($variantIds as $variantId) {
             if ($this->stockRegistry->getProductStockStatus($variantId)) {
                 return true;

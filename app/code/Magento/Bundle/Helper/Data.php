@@ -5,6 +5,8 @@
  */
 namespace Magento\Bundle\Helper;
 
+use Magento\Bundle\Model\Product\Type as BundleType;
+
 /**
  * Bundle helper
  */
@@ -34,7 +36,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getAllowedSelectionTypes()
     {
-        $configData = $this->config->getType(\Magento\Catalog\Model\Product\Type::TYPE_BUNDLE);
+        $configData = $this->config->getType(BundleType::TYPE_CODE);
 
         return $configData['allowed_selection_types'] ?? [];
     }
