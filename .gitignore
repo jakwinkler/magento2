@@ -73,3 +73,5 @@ atlassian*
 !/generated/.htaccess
 .DS_Store
 dev/tests/integration/tmp/
+magento_additional_image_one.jpg
+random_image_*.jpg
