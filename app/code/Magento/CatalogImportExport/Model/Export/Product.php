@@ -426,7 +426,7 @@ class Product extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
         \Magento\CatalogImportExport\Model\Export\RowCustomizerInterface $rowCustomizer,
         array $dateAttrCodes = [],
         ?ProductFilterInterface $filter = null,
-        ?StockConfigurationInterface $stockConfiguration = null
+        StockConfigurationInterface $stockConfiguration
     ) {
         $this->_entityCollectionFactory = $collectionFactory;
         $this->_exportConfig = $exportConfig;
@@ -644,16 +644,14 @@ class Product extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
                 $stockItemRow['stock_status_changed_auto']
             );
 
-            if ($this->stockConfiguration !== null) {
-                if ($stockItemRow['use_config_max_sale_qty']) {
-                    $stockItemRow['max_sale_qty'] = $this->stockConfiguration->getMaxSaleQty();
-                }
-                if ($stockItemRow['use_config_min_sale_qty']) {
-                    $stockItemRow['min_sale_qty'] = $this->stockConfiguration->getMinSaleQty();
-                }
-                if ($stockItemRow['use_config_manage_stock']) {
-                    $stockItemRow['manage_stock'] = $this->stockConfiguration->getManageStock();
-                }
+            if ($stockItemRow['use_config_max_sale_qty']) {
+                $stockItemRow['max_sale_qty'] = $this->stockConfiguration->getMaxSaleQty();
+            }
+            if ($stockItemRow['use_config_min_sale_qty']) {
+                $stockItemRow['min_sale_qty'] = $this->stockConfiguration->getMinSaleQty();
+            }
+            if ($stockItemRow['use_config_manage_stock']) {
+                $stockItemRow['manage_stock'] = $this->stockConfiguration->getManageStock();
             }
 
             $stockItemRows[$productId] = $stockItemRow;
@@ -817,7 +815,7 @@ class Product extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
                 ],
                 $exportAttributes,
                 [self::COL_ADDITIONAL_ATTRIBUTES],
-                reset($stockItemRows) ? array_keys(end($stockItemRows)) : [],
+                $this->getSortedStockItemKeys($stockItemRows),
                 [
                     'related_skus',
                     'related_position',
@@ -1796,5 +1794,21 @@ class Product extends \Magento\ImportExport\Model\Export\Entity\AbstractEntity
             '\\' . CategoryProcessor::DELIMITER_CATEGORY,
             $string
         );
+    }
+
+    /**
+     * Get sorted stock item attribute keys for deterministic CSV header ordering.
+     *
+     * @param array $stockItemRows
+     * @return array
+     */
+    private function getSortedStockItemKeys(array $stockItemRows): array
+    {
+        if (!reset($stockItemRows)) {
+            return [];
+        }
+        $keys = array_keys(end($stockItemRows));
+        sort($keys);
+        return $keys;
     }
 }
