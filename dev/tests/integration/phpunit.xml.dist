@@ -34,6 +34,23 @@
             <directory>testsuite</directory>
             <directory>../../../app/code/*/*/Test/Integration</directory>
             <exclude>testsuite/Magento/MemoryUsageTest.php</exclude>
+            <exclude>testsuite/Magento/Catalog/Block/Adminhtml/Product/Edit/Tab/Alerts/AbstractAlertTest.php</exclude>
+            <exclude>testsuite/Magento/Catalog/Block/Product/ProductList/AbstractLinksTest.php</exclude>
+            <exclude>testsuite/Magento/Catalog/Block/Product/View/AbstractCurrencyTest.php</exclude>
+            <exclude>testsuite/Magento/Catalog/Block/Product/View/Attribute/AbstractAttributeTest.php</exclude>
+            <exclude>testsuite/Magento/Catalog/Block/Product/View/Options/AbstractRenderCustomOptionsTest.php</exclude>
+            <exclude>testsuite/Magento/Catalog/Controller/Adminhtml/Product/AbstractAlertTest.php</exclude>
+            <exclude>testsuite/Magento/Catalog/Controller/Adminhtml/Product/Attribute/Delete/AbstractDeleteAttributeControllerTest.php</exclude>
+            <exclude>testsuite/Magento/Catalog/Controller/Adminhtml/Product/Attribute/Save/AbstractSaveAttributeTest.php</exclude>
+            <exclude>testsuite/Magento/Catalog/Controller/Adminhtml/Product/Attribute/Update/AbstractUpdateAttributeTest.php</exclude>
+            <exclude>testsuite/Magento/Catalog/Model/Product/Attribute/Save/AbstractAttributeTest.php</exclude>
+            <exclude>testsuite/Magento/Catalog/Ui/DataProvider/Product/Form/Modifier/AbstractEavTest.php</exclude>
+            <exclude>testsuite/Magento/Catalog/Ui/DataProvider/Product/Related/AbstractRelationsDataProviderTest.php</exclude>
+            <exclude>testsuite/Magento/Bundle/Block/Catalog/Product/View/Type/AbstractBundleOptionsViewTest.php</exclude>
+            <exclude>testsuite/Magento/Bundle/Controller/Adminhtml/Product/AbstractBundleProductSaveTest.php</exclude>
+            <exclude>testsuite/Magento/Sales/Block/Adminhtml/Order/Create/AbstractAddressFormTest.php</exclude>
+            <exclude>testsuite/Magento/Sales/Controller/Adminhtml/Order/Invoice/AbstractInvoiceControllerTest.php</exclude>
+            <exclude>testsuite/Magento/Sales/Model/AbstractCollectorPositionsTest.php</exclude>
         </testsuite>
     </testsuites>
     <!-- Code coverage filters -->

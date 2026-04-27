@@ -92,9 +92,25 @@ class AreBundleOptionsSalable
             . " AND child_status_store.store_id = {$storeId}",
             []
         );
+        $optionsSaleabilitySelect->joinLeft(
+            ['child_stock' => $this->resourceConnection->getTableName('cataloginventory_stock_item')],
+            'child_stock.product_id = child_products.entity_id',
+            []
+        );
         $isOptionSalableExpr = new \Zend_Db_Expr(
             sprintf(
-                'MAX(IFNULL(child_status_store.value, child_status_global.value) != %s)',
+                'MAX('
+                . 'IFNULL(child_status_store.value, child_status_global.value) != %s'
+                . ' AND ('
+                . '   child_stock.is_in_stock IS NULL'
+                . '   OR child_stock.manage_stock = 0'
+                . '   OR (child_stock.is_in_stock = 1 AND ('
+                . '     child_stock.backorders > 0'
+                . '     OR bundle_selections.selection_can_change_qty = 1'
+                . '     OR child_stock.qty >= bundle_selections.selection_qty'
+                . '   ))'
+                . ' )'
+                . ')',
                 ProductStatus::STATUS_DISABLED
             )
         );

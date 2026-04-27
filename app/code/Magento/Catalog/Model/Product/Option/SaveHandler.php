@@ -24,30 +24,33 @@ use Magento\Framework\Exception\CouldNotSaveException;
 class SaveHandler implements ExtensionInterface
 {
     /**
-     * @var string[]
-     */
-    private array $compositeProductTypes = ['grouped', 'configurable', 'bundle'];
-
-    /**
-     * @var OptionRepository
+     * @var \Magento\Catalog\Api\ProductCustomOptionRepositoryInterface
      */
     protected OptionRepository $optionRepository;
 
     /**
-     * @var Relation
+     * @var \Magento\Catalog\Model\ResourceModel\Product\Relation
      */
     private $relation;
 
     /**
-     * @param OptionRepository $optionRepository
-     * @param Relation|null $relation
+     * @var string[]
+     */
+    private array $compositeProductTypes;
+
+    /**
+     * @param \Magento\Catalog\Api\ProductCustomOptionRepositoryInterface $optionRepository
+     * @param \Magento\Catalog\Model\ResourceModel\Product\Relation|null $relation
+     * @param array $compositeProductTypes
      */
     public function __construct(
         OptionRepository $optionRepository,
-        ?Relation        $relation = null
+        ?Relation        $relation = null,
+        array            $compositeProductTypes = []
     ) {
         $this->optionRepository = $optionRepository;
         $this->relation = $relation ?: ObjectManager::getInstance()->get(Relation::class);
+        $this->compositeProductTypes = $compositeProductTypes;
     }
 
     /**
@@ -55,9 +58,9 @@ class SaveHandler implements ExtensionInterface
      *
      * @param object $entity
      * @param array $arguments
-     * @return ProductInterface|object
+     * @return \Magento\Catalog\Api\Data\ProductInterface|object
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @throws CouldNotSaveException
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
     public function execute($entity, $arguments = [])
     {
@@ -74,7 +77,7 @@ class SaveHandler implements ExtensionInterface
             }, $options);
         }
 
-        /** @var ProductInterface $entity */
+        /** @var \Magento\Catalog\Api\Data\ProductInterface $entity */
         foreach ($this->optionRepository->getProductOptions($entity) as $option) {
             if (!in_array($option->getOptionId(), $optionIds)) {
                 $this->optionRepository->delete($option);
@@ -92,14 +95,14 @@ class SaveHandler implements ExtensionInterface
      *
      * @param array $options
      * @param bool $hasChangedSku
-     * @param ProductInterface $product
+     * @param \Magento\Catalog\Api\Data\ProductInterface $product
      * @return void
-     * @throws CouldNotSaveException
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
     private function processOptionsSaving(array $options, bool $hasChangedSku, ProductInterface $product): void
     {
         $isProductHasRelations = $this->isProductHasRelations($product);
-        /** @var ProductCustomOptionInterface $option */
+        /** @var \Magento\Catalog\Api\Data\ProductCustomOptionInterface $option */
         foreach ($options as $option) {
             if (!$isProductHasRelations && $option->getIsRequire()) {
                 $message = 'Required custom options cannot be added to a simple product'
@@ -117,7 +120,7 @@ class SaveHandler implements ExtensionInterface
     /**
      * Check if product doesn't belong to composite product
      *
-     * @param ProductInterface $product
+     * @param \Magento\Catalog\Api\Data\ProductInterface $product
      * @return bool
      */
     private function isProductHasRelations(ProductInterface $product): bool

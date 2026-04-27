@@ -24,28 +24,19 @@ use Magento\Store\Model\ScopeInterface;
 class ProductStock
 {
     /**
-     * Bundle product type code
-     */
-    private const PRODUCT_TYPE_BUNDLE = "bundle";
-
-    /**
-     * Configurable product type code
-     */
-    private const PRODUCT_TYPE_CONFIGURABLE = "configurable";
-
-    /**
      * ProductStock Constructor
      *
+    /**
      * @param ProductRepositoryInterface $productRepositoryInterface
-     * @param StockState $stockState
+     * @param StockState|null $stockState
      * @param ScopeConfigInterface $scopeConfig
-     * @param StockRegistryInterface $stockRegistry
+     * @param StockRegistryInterface|null $stockRegistry
      */
     public function __construct(
         private readonly ProductRepositoryInterface $productRepositoryInterface,
-        private readonly StockState $stockState,
+        private readonly ?StockState $stockState,
         private readonly ScopeConfigInterface $scopeConfig,
-        private readonly StockRegistryInterface $stockRegistry
+        private readonly ?StockRegistryInterface $stockRegistry
     ) {
     }
 
@@ -61,7 +52,7 @@ class ProductStock
         $requestedQty = (float)($cartItem->getQtyToAdd() ?? $cartItem->getQty());
         $previousQty = (int)$cartItem->getPreviousQty() ?? 0;
 
-        if ($cartItem->getProductType() === self::PRODUCT_TYPE_BUNDLE) {
+        if ($cartItem->getHasChildren() && !empty($cartItem->getQtyOptions())) {
             return $this->isStockAvailableBundle($cartItem, $previousQty, $requestedQty);
         }
 
@@ -125,7 +116,7 @@ class ProductStock
      */
     public function getProductAvailableStock(Item $cartItem): float
     {
-        if ($cartItem->getProductType() === self::PRODUCT_TYPE_BUNDLE) {
+        if ($cartItem->getHasChildren() && !empty($cartItem->getQtyOptions())) {
             return $this->getLowestStockValueOfBundleProduct($cartItem);
         }
 
@@ -152,8 +143,9 @@ class ProductStock
          */
         $variantProduct = null;
 
-        if ($cartItem->getProductType() === self::PRODUCT_TYPE_CONFIGURABLE) {
-            if ($cartItem->getChildren()[0] !== null) {
+        $children = $cartItem->getChildren();
+        if (!empty($children) && $cartItem->getProductType() !== $cartItem->getRealProductType()) {
+            if ($children[0] !== null) {
                 $variantProduct = $this->productRepositoryInterface->get($cartItem->getSku());
             }
         }
@@ -177,6 +169,10 @@ class ProductStock
         float $requiredQuantity,
         float $prevQty
     ): bool {
+        if ($this->stockState === null || $this->stockRegistry === null) {
+            return true;
+        }
+
         $this->stockState->checkQuoteItemQty(
             $product->getId(),
             $itemQty,
@@ -197,6 +193,10 @@ class ProductStock
      */
     private function getAvailableStock(ProductInterface $product): float
     {
+        if ($this->stockRegistry === null) {
+            return 0.0;
+        }
+
         return (float) $this->getProductStockStatus($product)->getQty();
     }
 
@@ -264,7 +264,7 @@ class ProductStock
      */
     public function getSaleableQtyByCartItem(Item $cartItem, ?float $thresholdQty): float
     {
-        if ($cartItem->getProductType() === self::PRODUCT_TYPE_BUNDLE) {
+        if ($cartItem->getHasChildren() && !empty($cartItem->getQtyOptions())) {
             return $this->getLowestSaleableQtyOfBundleProduct($cartItem, $thresholdQty);
         }
 
@@ -285,6 +285,10 @@ class ProductStock
      */
     public function getSaleableQty(ProductInterface $product, ?float $thresholdQty): float
     {
+        if ($this->stockRegistry === null) {
+            return 0.0;
+        }
+
         $stockStatus = $this->stockRegistry->getStockStatus($product->getId(), $product->getStore()->getWebsiteId());
         $stockQty = (float)$stockStatus->getQty();
         if ($thresholdQty === null) {
@@ -301,8 +305,12 @@ class ProductStock
      * @param ProductInterface $product
      * @return StockStatusInterface
      */
-    private function getProductStockStatus(ProductInterface $product): StockStatusInterface
+    private function getProductStockStatus(ProductInterface $product): ?StockStatusInterface
     {
+        if ($this->stockRegistry === null) {
+            return null;
+        }
+
         return $this->stockRegistry->getStockStatus(
             $product->getId(),
             $product->getStore()->getWebsiteId()

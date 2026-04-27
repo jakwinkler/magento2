@@ -22,9 +22,9 @@ class SalableProcessor
     private $stockStatusFactory;
 
     /**
-     * @param StatusFactory $stockStatusFactory
+     * @param StatusFactory|null $stockStatusFactory
      */
-    public function __construct(StatusFactory $stockStatusFactory)
+    public function __construct(?StatusFactory $stockStatusFactory = null)
     {
         $this->stockStatusFactory = $stockStatusFactory;
     }
@@ -48,7 +48,7 @@ class SalableProcessor
         );
 
         $stockFlag = 'has_stock_status_filter';
-        if (!$collection->hasFlag($stockFlag)) {
+        if ($this->stockStatusFactory !== null && !$collection->hasFlag($stockFlag)) {
             $stockStatusResource = $this->stockStatusFactory->create();
             $stockStatusResource->addStockDataToCollection($collection, true);
             $collection->setFlag($stockFlag, true);

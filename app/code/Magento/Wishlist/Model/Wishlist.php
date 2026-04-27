@@ -210,8 +210,7 @@ class Wishlist extends AbstractModel implements IdentityInterface
         $this->serializer = $serializer ?: ObjectManager::getInstance()->get(Json::class);
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
         $this->productRepository = $productRepository;
-        $this->stockConfiguration = $stockConfiguration
-            ?: ObjectManager::getInstance()->get(StockConfigurationInterface::class);
+        $this->stockConfiguration = $stockConfiguration;
     }
 
     /**
@@ -463,7 +462,7 @@ class Wishlist extends AbstractModel implements IdentityInterface
             throw new LocalizedException(__('Cannot specify product.'));
         }
 
-        if (!$this->stockConfiguration->isShowOutOfStock($storeId) && !$product->getIsSalable()) {
+        if ($this->stockConfiguration !== null && !$this->stockConfiguration->isShowOutOfStock($storeId) && !$product->getIsSalable()) {
             throw new StockStateException(__('Cannot add product without stock to wishlist.'));
         }
 

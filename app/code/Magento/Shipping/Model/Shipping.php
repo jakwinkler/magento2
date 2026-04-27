@@ -367,9 +367,7 @@ class Shipping implements RateCollectorInterface
 
         /** @var $item \Magento\Quote\Model\Quote\Item */
         foreach ($allItems as $item) {
-            if ($item->getProductType() == \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE
-                && $item->getProduct()->getShipmentType()
-            ) {
+            if ($item->getHasChildren() && $item->getProduct()->getShipmentType()) {
                 continue;
             }
 
@@ -392,9 +390,7 @@ class Shipping implements RateCollectorInterface
             }
 
             $itemWeight = (float) $item->getWeight();
-            if ($item->getIsQtyDecimal()
-                && $item->getProductType() != \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE
-            ) {
+            if ($item->getIsQtyDecimal() && !$item->getHasChildren()) {
                 $productId = $item->getProduct()->getId();
                 $itemWeightWhole = $itemWeight * $item->getQty();
                 $stockItem = $this->stockRegistry->getStockItem($productId, $item->getStore()->getWebsiteId());
@@ -424,7 +420,7 @@ class Shipping implements RateCollectorInterface
             if ($changeQty
                 && !$item->getParentItem()
                 && $item->getIsQtyDecimal()
-                && $item->getProductType() != \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE
+                && !$item->getHasChildren()
             ) {
                 $qty = 1;
             }

@@ -23,9 +23,9 @@ class AddToCompareAvailability implements ArgumentInterface
     private $stockConfiguration;
 
     /**
-     * @param StockConfigurationInterface $stockConfiguration
+     * @param StockConfigurationInterface|null $stockConfiguration
      */
-    public function __construct(StockConfigurationInterface $stockConfiguration)
+    public function __construct(?StockConfigurationInterface $stockConfiguration = null)
     {
         $this->stockConfiguration = $stockConfiguration;
     }
@@ -39,7 +39,8 @@ class AddToCompareAvailability implements ArgumentInterface
     public function isAvailableForCompare(ProductInterface $product): bool
     {
         if ((int)$product->getStatus() !== Status::STATUS_DISABLED) {
-            return $product->isSalable() || $this->stockConfiguration->isShowOutOfStock();
+            return $product->isSalable()
+                || ($this->stockConfiguration !== null && $this->stockConfiguration->isShowOutOfStock());
         }
 
         return false;

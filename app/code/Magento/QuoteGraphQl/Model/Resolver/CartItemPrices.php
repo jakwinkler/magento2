@@ -15,7 +15,6 @@ use Magento\Framework\ObjectManager\ResetAfterRequestInterface;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Quote\Model\Cart\Totals;
 use Magento\Quote\Model\Quote\Item;
-use Magento\Downloadable\Model\Product\Type;
 use Magento\QuoteGraphQl\Model\Cart\TotalsCollector;
 use Magento\QuoteGraphQl\Model\GetDiscounts;
 use Magento\QuoteGraphQl\Model\GetOptionsRegularPrice;
@@ -71,8 +70,8 @@ class CartItemPrices implements ResolverInterface, ResetAfterRequestInterface
         }
         $currencyCode = $cartItem->getQuote()->getQuoteCurrencyCode();
 
-        /** calculate bundle product discount */
-        if ($cartItem->getProductType() == 'bundle') {
+        /** calculate composite product discount from extension attributes */
+        if ($cartItem->getHasChildren() && $cartItem->getExtensionAttributes()->getDiscounts()) {
             $discounts = $cartItem->getExtensionAttributes()->getDiscounts() ?? [];
             $discountAmount = 0;
             foreach ($discounts as $discount) {
@@ -130,8 +129,8 @@ class CartItemPrices implements ResolverInterface, ResetAfterRequestInterface
         $originalItemPrice = $cartItem->getOriginalPrice() + $this->getCustomOptionPrice($cartItem);
 
         // To add downloadable product link price to the original item price
-        if ($cartItem->getProductType() === Type::TYPE_DOWNLOADABLE &&
-            $cartItem->getProduct()->getData('links_purchased_separately')) {
+        if ($cartItem->getProduct()->getCustomOption('downloadable_link_ids')
+            && $cartItem->getProduct()->getData('links_purchased_separately')) {
             $originalItemPrice += (float)$this->getDownloadableLinkPrice($cartItem);
         }
 

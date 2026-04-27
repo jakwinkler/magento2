@@ -72,3 +72,4 @@ atlassian*
 /generated/*
 !/generated/.htaccess
 .DS_Store
+dev/tests/integration/tmp/

@@ -8,7 +8,6 @@ namespace Magento\Catalog\Model\Product\Price\Validation;
 
 use Magento\Catalog\Api\Data\TierPriceInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Catalog\Model\Product\Type;
 use Magento\Catalog\Model\ProductIdLocatorInterface;
 use Magento\Directory\Model\Currency;
 use Magento\Framework\App\ResourceConnection;
@@ -95,6 +94,13 @@ class TierPriceValidator implements ResetAfterRequestInterface
     private StoreManagerInterface $storeManager;
 
     /**
+     * Product types that only allow discount-type tier prices (not fixed).
+     *
+     * @var array
+     */
+    private array $discountOnlyPriceTypes;
+
+    /**
      * TierPriceValidator constructor.
      *
      * @param ProductIdLocatorInterface $productIdLocator
@@ -106,6 +112,7 @@ class TierPriceValidator implements ResetAfterRequestInterface
      * @param ResourceConnection|null $resourceConnection
      * @param ScopeConfigInterface|null $scopeConfig
      * @param StoreManagerInterface|null $storeManager
+     * @param array $discountOnlyPriceTypes Product types that only allow discount tier prices
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -117,7 +124,8 @@ class TierPriceValidator implements ResetAfterRequestInterface
         array $allowedProductTypes = [],
         ?ResourceConnection $resourceConnection = null,
         ?ScopeConfigInterface $scopeConfig = null,
-        ?StoreManagerInterface $storeManager = null
+        ?StoreManagerInterface $storeManager = null,
+        array $discountOnlyPriceTypes = []
     ) {
         $this->productIdLocator = $productIdLocator;
         $this->websiteRepository = $websiteRepository;
@@ -128,6 +136,7 @@ class TierPriceValidator implements ResetAfterRequestInterface
         $this->resourceConnection = $resourceConnection ?: ObjectManager::getInstance()->get(ResourceConnection::class);
         $this->scopeConfig = $scopeConfig ?: ObjectManager::getInstance()->get(ScopeConfigInterface::class);
         $this->storeManager = $storeManager ?: ObjectManager::getInstance()->get(StoreManagerInterface::class);
+        $this->discountOnlyPriceTypes = $discountOnlyPriceTypes;
     }
 
     /**
@@ -282,7 +291,7 @@ class TierPriceValidator implements ResetAfterRequestInterface
                     TierPriceInterface::PRICE_TYPE_DISCOUNT
                 ]
         )
-            || (array_search(Type::TYPE_BUNDLE, $ids) !== false
+            || ($this->hasDiscountOnlyPriceType($ids)
                 && $price->getPriceType() !== TierPriceInterface::PRICE_TYPE_DISCOUNT)
         ) {
             $validationResult->addFailedItem(
@@ -545,6 +554,22 @@ class TierPriceValidator implements ResetAfterRequestInterface
         }
 
         return $price->getWebsiteId() == $tierPrice->getWebsiteId();
+    }
+
+    /**
+     * Check if any of the product type IDs belongs to a discount-only price type.
+     *
+     * @param array $ids
+     * @return bool
+     */
+    private function hasDiscountOnlyPriceType(array $ids): bool
+    {
+        foreach ($ids as $type) {
+            if (in_array($type, $this->discountOnlyPriceTypes, true)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

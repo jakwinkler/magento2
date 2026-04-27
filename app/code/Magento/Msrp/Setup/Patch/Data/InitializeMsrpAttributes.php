@@ -50,8 +50,6 @@ class InitializeMsrpAttributes implements DataPatchInterface, PatchVersionInterf
         $productTypes = [
             \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE,
             \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL,
-            \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE,
-            \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE,
         ];
         $productTypes = join(',', $productTypes);
         $eavSetup->addAttribute(

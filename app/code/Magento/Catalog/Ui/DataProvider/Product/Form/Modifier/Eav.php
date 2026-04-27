@@ -216,6 +216,13 @@ class Eav extends AbstractModifier
     private $auth;
 
     /**
+     * Product types where special_price is a percentage value, not a fixed price.
+     *
+     * @var array
+     */
+    private array $percentageSpecialPriceTypes;
+
+    /**
      * Eav constructor.
      * @param LocatorInterface $locator
      * @param CatalogEavValidationRules $catalogEavValidationRules
@@ -240,6 +247,7 @@ class Eav extends AbstractModifier
      * @param ScopeConfigInterface|null $scopeConfig
      * @param AttributeCollectionFactory $attributeCollectionFactory
      * @param AuthorizationInterface|null $auth
+     * @param array $percentageSpecialPriceTypes Product types where special_price is percentage
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -265,7 +273,8 @@ class Eav extends AbstractModifier
         ?CompositeConfigProcessor $wysiwygConfigProcessor = null,
         ?ScopeConfigInterface $scopeConfig = null,
         ?AttributeCollectionFactory $attributeCollectionFactory = null,
-        ?AuthorizationInterface $auth = null
+        ?AuthorizationInterface $auth = null,
+        array $percentageSpecialPriceTypes = []
     ) {
         $this->locator = $locator;
         $this->catalogEavValidationRules = $catalogEavValidationRules;
@@ -292,6 +301,7 @@ class Eav extends AbstractModifier
         $this->attributeCollectionFactory = $attributeCollectionFactory
             ?: ObjectManager::getInstance()->get(AttributeCollectionFactory::class);
         $this->auth = $auth ?? ObjectManager::getInstance()->get(AuthorizationInterface::class);
+        $this->percentageSpecialPriceTypes = $percentageSpecialPriceTypes;
     }
 
     /**
@@ -443,18 +453,18 @@ class Eav extends AbstractModifier
     {
         return $attribute->getFrontendInput() === 'price'
             && is_scalar($attributeValue)
-            && !$this->isBundleSpecialPrice($attribute);
+            && !$this->isPercentageSpecialPrice($attribute);
     }
 
     /**
-     * Obtain if current product is bundle and given attribute is special_price
+     * Check if current product type uses percentage-based special price
      *
      * @param \Magento\Catalog\Api\Data\ProductAttributeInterface $attribute
      * @return bool
      */
-    private function isBundleSpecialPrice(ProductAttributeInterface $attribute)
+    private function isPercentageSpecialPrice(ProductAttributeInterface $attribute): bool
     {
-        return $this->locator->getProduct()->getTypeId() === ProductType::TYPE_BUNDLE
+        return in_array($this->locator->getProduct()->getTypeId(), $this->percentageSpecialPriceTypes, true)
             && $attribute->getAttributeCode() === ProductAttributeInterface::CODE_SPECIAL_PRICE;
     }
 

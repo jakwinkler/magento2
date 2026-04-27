@@ -18,10 +18,10 @@ class ConfigurableOptionsStockStatusFilter implements ConfigurableOptionsFilterI
     private $stockConfig;
 
     /**
-     * @param StockConfigurationInterface $stockConfig
+     * @param StockConfigurationInterface|null $stockConfig
      */
     public function __construct(
-        StockConfigurationInterface $stockConfig
+        ?StockConfigurationInterface $stockConfig = null
     ) {
         $this->stockConfig = $stockConfig;
     }
@@ -31,7 +31,7 @@ class ConfigurableOptionsStockStatusFilter implements ConfigurableOptionsFilterI
      */
     public function filter(ProductInterface $parentProduct, array $childProducts): array
     {
-        if ($this->stockConfig->isShowOutOfStock()) {
+        if ($this->stockConfig !== null && $this->stockConfig->isShowOutOfStock()) {
             $result = $childProducts;
             if ($parentProduct->getIsSalable()) {
                 $result = $this->filterInStockProducts($childProducts) ?: $childProducts;

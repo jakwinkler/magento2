@@ -98,7 +98,7 @@ class AssociatedProducts
      * @param UrlInterface $urlBuilder
      * @param ConfigurableType $configurableType
      * @param ProductRepositoryInterface $productRepository
-     * @param StockRegistryInterface $stockRegistry
+     * @param StockRegistryInterface|null $stockRegistry
      * @param VariationMatrix $variationMatrix
      * @param CurrencyInterface $localeCurrency
      * @param JsonHelper $jsonHelper
@@ -111,7 +111,7 @@ class AssociatedProducts
         UrlInterface $urlBuilder,
         ConfigurableType $configurableType,
         ProductRepositoryInterface $productRepository,
-        StockRegistryInterface $stockRegistry,
+        ?StockRegistryInterface $stockRegistry,
         VariationMatrix $variationMatrix,
         CurrencyInterface $localeCurrency,
         JsonHelper $jsonHelper,
@@ -388,6 +388,10 @@ class AssociatedProducts
      */
     protected function getProductStockQty(Product $product)
     {
+        if ($this->stockRegistry === null) {
+            return 0;
+        }
+
         return $this->stockRegistry->getStockItem($product->getId(), $product->getStore()->getWebsiteId())->getQty();
     }
 

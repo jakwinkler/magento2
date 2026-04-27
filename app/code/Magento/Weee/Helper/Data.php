@@ -850,8 +850,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper implements Reset
      */
     public function getWeeeAttributesForBundle($product)
     {
-        if ($product->getTypeId() == \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE) {
-            $typeInstance = $product->getTypeInstance();
+        $typeInstance = $product->getTypeInstance();
+        if (method_exists($typeInstance, 'getSelectionsCollection')) {
             $typeInstance->setStoreFilter($product->getStoreId(), $product);
 
             $selectionCollection = $typeInstance->getSelectionsCollection(

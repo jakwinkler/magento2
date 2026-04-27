@@ -66,8 +66,7 @@ class Sample extends Download
         $this->relatedProductRetriever = $relatedProductRetriever;
         $this->file = $file ?: ObjectManager::getInstance()->get(File::class);
         $this->sampleFactory = $sampleFactory ?: ObjectManager::getInstance()->get(SampleFactory::class);
-        $this->stockConfiguration = $stockConfiguration
-            ?: ObjectManager::getInstance()->get(StockConfigurationInterface::class);
+        $this->stockConfiguration = $stockConfiguration;
     }
 
     /**
@@ -100,7 +99,8 @@ class Sample extends Download
         if ($product && $sample->getId()) {
             $isProductEnabled = (int) $product->getStatus() === Status::STATUS_ENABLED;
 
-            return $product->isSalable() || $this->stockConfiguration->isShowOutOfStock() && $isProductEnabled;
+            return $product->isSalable()
+                || ($this->stockConfiguration !== null && $this->stockConfiguration->isShowOutOfStock() && $isProductEnabled);
         }
 
         return false;

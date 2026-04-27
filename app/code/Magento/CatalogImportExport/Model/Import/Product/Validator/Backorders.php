@@ -13,10 +13,10 @@ use Magento\CatalogInventory\Model\Source\Backorders as BackordersSource;
 class Backorders extends AbstractImportValidator implements RowValidatorInterface
 {
     /**
-     * @param BackordersSource $backordersSource
+     * @param BackordersSource|null $backordersSource
      */
     public function __construct(
-        private readonly BackordersSource $backordersSource
+        private readonly ?BackordersSource $backordersSource = null
     ) {
     }
 
@@ -40,6 +40,10 @@ class Backorders extends AbstractImportValidator implements RowValidatorInterfac
             $message = sprintf($messageTemplate, 'allow_backorders');
             $this->_addMessages([$message]);
             return false;
+        }
+
+        if ($this->backordersSource === null) {
+            return true;
         }
 
         $allowedValues = array_column($this->backordersSource->toOptionArray(), 'label', 'value');

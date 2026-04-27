@@ -9,7 +9,6 @@
         "lib-libxml": "*",
         "magento/framework": "*",
         "magento/module-catalog": "*",
-        "magento/module-catalog-inventory": "*",
         "magento/module-config": "*",
         "magento/module-directory": "*",
         "magento/module-quote": "*",

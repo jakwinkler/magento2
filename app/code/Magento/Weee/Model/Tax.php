@@ -8,9 +8,8 @@ namespace Magento\Weee\Model;
 use Magento\Catalog\Model\Product;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
-use Magento\Store\Model\Website;
 use Magento\Customer\Api\AccountManagementInterface;
-use Magento\Catalog\Model\Product\Type;
+use Magento\Store\Model\Website;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -197,7 +196,8 @@ class Tax extends \Magento\Framework\Model\AbstractModel
             );
         }
 
-        if (Type::TYPE_BUNDLE !== $product->getTypeId() || $product->getPriceType()) {
+        $hasDynamicPricing = $product->hasData('price_type') && !$product->getPriceType();
+        if (!$hasDynamicPricing) {
             foreach ($attributes as $attribute) {
                 $amountExclTax += $attribute->getAmountExclTax();
             }

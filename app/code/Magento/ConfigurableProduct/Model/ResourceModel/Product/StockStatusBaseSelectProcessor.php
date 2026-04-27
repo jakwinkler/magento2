@@ -29,12 +29,12 @@ class StockStatusBaseSelectProcessor implements BaseSelectProcessorInterface
     private $stockStatusResource;
 
     /**
-     * @param StockConfigurationInterface $stockConfig
-     * @param StockStatusResource $stockStatusResource
+     * @param StockConfigurationInterface|null $stockConfig
+     * @param StockStatusResource|null $stockStatusResource
      */
     public function __construct(
-        StockConfigurationInterface $stockConfig,
-        StockStatusResource $stockStatusResource
+        ?StockConfigurationInterface $stockConfig = null,
+        ?StockStatusResource $stockStatusResource = null
     ) {
         $this->stockConfig = $stockConfig;
         $this->stockStatusResource = $stockStatusResource;
@@ -45,7 +45,7 @@ class StockStatusBaseSelectProcessor implements BaseSelectProcessorInterface
      */
     public function process(Select $select)
     {
-        if ($this->stockConfig->isShowOutOfStock()) {
+        if ($this->stockConfig !== null && $this->stockStatusResource !== null && $this->stockConfig->isShowOutOfStock()) {
             $select->joinInner(
                 ['stock' => $this->stockStatusResource->getMainTable()],
                 sprintf(

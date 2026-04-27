@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Magento\Bundle\Model\Plugin;
 
+use Magento\Bundle\Model\Product\Type as BundleType;
+
 /**
  * Make price validation optional for bundle dynamic
  */
@@ -28,7 +30,7 @@ class PriceBackend
         $object
     ) {
         if ($object instanceof \Magento\Catalog\Model\Product
-            && $object->getTypeId() == \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE
+            && $object->getTypeId() == BundleType::TYPE_CODE
             && $object->getPriceType() == \Magento\Bundle\Model\Product\Price::PRICE_TYPE_DYNAMIC
         ) {
             return true;

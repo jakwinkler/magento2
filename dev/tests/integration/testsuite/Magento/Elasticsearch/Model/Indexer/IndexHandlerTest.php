@@ -226,6 +226,8 @@ class IndexHandlerTest extends TestCase
         $stockRepository = Bootstrap::getObjectManager()->create(StockItemRepositoryInterface::class);
         $stockRepository->save($stockItem);
 
+        $this->indexer->reindexAll();
+
         foreach ($this->storeIds as $storeId) {
             $products = $this->searchByName('ProductOption1', $storeId);
             $this->assertEmpty($products);

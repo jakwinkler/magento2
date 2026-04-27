@@ -34,7 +34,7 @@ $catalogHelper = $block->getData('catalogHelper');
 
 <?php foreach ($items as $_item): ?>
     <?php
-    $shipTogether = ($_item->getOrderItem()->getProductType() == \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE) ?
+    $shipTogether = ($_item->getOrderItem()->getProductType() == \Magento\Bundle\Model\Product\Type::TYPE_CODE) ?
         !$_item->getOrderItem()->isShipSeparately() : !$_item->getOrderItem()->getParentItem()->isShipSeparately()
     ?>
     <?php $block->setPriceDataObject($_item) ?>

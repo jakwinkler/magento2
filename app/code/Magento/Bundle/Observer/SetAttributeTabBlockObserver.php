@@ -5,6 +5,7 @@
  */
 namespace Magento\Bundle\Observer;
 
+use Magento\Bundle\Model\Product\Type as BundleType;
 use Magento\Framework\Event\ObserverInterface;
 
 class SetAttributeTabBlockObserver implements ObserverInterface
@@ -33,7 +34,7 @@ class SetAttributeTabBlockObserver implements ObserverInterface
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         $product = $observer->getEvent()->getProduct();
-        if ($product->getTypeId() == \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE) {
+        if ($product->getTypeId() == BundleType::TYPE_CODE) {
             $this->helperCatalog->setAttributeTabBlock(
                 \Magento\Bundle\Block\Adminhtml\Catalog\Product\Edit\Tab\Attributes::class
             );
